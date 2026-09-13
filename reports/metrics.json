@@ -1,0 +1,119 @@
+{
+  "split": {
+    "train": [
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023
+    ],
+    "val": [
+      2024,
+      2025
+    ],
+    "test": [
+      2026
+    ]
+  },
+  "data": {
+    "train_matches": 984,
+    "train_by_competition": {
+      "ipl": 984
+    },
+    "other_weight": 0.0,
+    "competition_feature": false
+  },
+  "innings": {
+    "1": {
+      "blend_weight": 0.30000000000000004,
+      "gbm_trees": 59,
+      "matches": {
+        "train": 984,
+        "val": 140,
+        "test": 71
+      },
+      "rows": {
+        "train": 121635,
+        "val": 17448,
+        "test": 8855
+      },
+      "test": {
+        "logistic": {
+          "log_loss": 0.6953,
+          "brier": 0.247,
+          "auc": 0.7038,
+          "ece": 0.2001
+        },
+        "gbm": {
+          "log_loss": 0.6432,
+          "brier": 0.2264,
+          "auc": 0.6819,
+          "ece": 0.115
+        },
+        "blend": {
+          "log_loss": 0.671,
+          "brier": 0.2383,
+          "auc": 0.7004,
+          "ece": 0.1744
+        },
+        "calibrated": {
+          "log_loss": 0.6805,
+          "brier": 0.2385,
+          "auc": 0.7004,
+          "ece": 0.1581
+        }
+      }
+    },
+    "2": {
+      "blend_weight": 0.30000000000000004,
+      "gbm_trees": 180,
+      "matches": {
+        "train": 984,
+        "val": 140,
+        "test": 71
+      },
+      "rows": {
+        "train": 113434,
+        "val": 15978,
+        "test": 8082
+      },
+      "test": {
+        "logistic": {
+          "log_loss": 0.3487,
+          "brier": 0.1101,
+          "auc": 0.9479,
+          "ece": 0.118
+        },
+        "gbm": {
+          "log_loss": 0.413,
+          "brier": 0.137,
+          "auc": 0.9043,
+          "ece": 0.1146
+        },
+        "blend": {
+          "log_loss": 0.3587,
+          "brier": 0.114,
+          "auc": 0.941,
+          "ece": 0.1194
+        },
+        "calibrated": {
+          "log_loss": 0.3455,
+          "brier": 0.1114,
+          "auc": 0.941,
+          "ece": 0.1062
+        }
+      }
+    }
+  }
+}

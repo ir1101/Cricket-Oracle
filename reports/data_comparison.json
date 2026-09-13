@@ -1,0 +1,94 @@
+{
+  "candidates": [
+    {
+      "other_weight": 0.0,
+      "competition_feature": false,
+      "innings1": {
+        "val_log_loss": 0.5859,
+        "blend_weight": 0.30000000000000004,
+        "gbm_trees": 59
+      },
+      "innings2": {
+        "val_log_loss": 0.3855,
+        "blend_weight": 0.30000000000000004,
+        "gbm_trees": 180
+      },
+      "mean_val_log_loss": 0.4857
+    },
+    {
+      "other_weight": 0.25,
+      "competition_feature": false,
+      "innings1": {
+        "val_log_loss": 0.5819,
+        "blend_weight": 0.9,
+        "gbm_trees": 598
+      },
+      "innings2": {
+        "val_log_loss": 0.3801,
+        "blend_weight": 0.65,
+        "gbm_trees": 614
+      },
+      "mean_val_log_loss": 0.481
+    },
+    {
+      "other_weight": 1.0,
+      "competition_feature": false,
+      "innings1": {
+        "val_log_loss": 0.5882,
+        "blend_weight": 0.5,
+        "gbm_trees": 96
+      },
+      "innings2": {
+        "val_log_loss": 0.3771,
+        "blend_weight": 0.75,
+        "gbm_trees": 699
+      },
+      "mean_val_log_loss": 0.4826
+    },
+    {
+      "other_weight": 0.25,
+      "competition_feature": true,
+      "innings1": {
+        "val_log_loss": 0.5859,
+        "blend_weight": 0.65,
+        "gbm_trees": 207
+      },
+      "innings2": {
+        "val_log_loss": 0.3827,
+        "blend_weight": 0.5,
+        "gbm_trees": 333
+      },
+      "mean_val_log_loss": 0.4843
+    },
+    {
+      "other_weight": 1.0,
+      "competition_feature": true,
+      "innings1": {
+        "val_log_loss": 0.5907,
+        "blend_weight": 0.15000000000000002,
+        "gbm_trees": 95
+      },
+      "innings2": {
+        "val_log_loss": 0.3773,
+        "blend_weight": 0.75,
+        "gbm_trees": 617
+      },
+      "mean_val_log_loss": 0.484
+    }
+  ],
+  "best": {
+    "other_weight": 0.25,
+    "competition_feature": false,
+    "innings1": {
+      "val_log_loss": 0.5819,
+      "blend_weight": 0.9,
+      "gbm_trees": 598
+    },
+    "innings2": {
+      "val_log_loss": 0.3801,
+      "blend_weight": 0.65,
+      "gbm_trees": 614
+    },
+    "mean_val_log_loss": 0.481
+  }
+}

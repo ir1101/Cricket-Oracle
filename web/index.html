@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cricket Oracle</title>
+  <meta name="description" content="Calibrated ball-by-ball win probability and chase difficulty for IPL matches.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="hero wrap">
+    <h1>Cricket Oracle</h1>
+    <p class="lede">
+      A match-outcome predictor for limited-overs cricket. Ingests ball-by-ball data, engineers innings-state
+      features (run rate trajectory, wickets-in-hand, venue priors), and blends a logistic baseline with a
+      gradient-boosted model. Calibrated probabilities power a chase-difficulty heatmap that updates live ball-by-ball.
+    </p>
+  </header>
+
+  <main class="wrap">
+    <section class="picker" aria-label="Choose a match">
+      <div class="field">
+        <label for="year">Season</label>
+        <select id="year"></select>
+      </div>
+      <div class="field">
+        <label for="team">Team</label>
+        <select id="team"><option value="">All teams</option></select>
+      </div>
+      <div class="field field-grow">
+        <label for="match">Match</label>
+        <select id="match" disabled><option>Loading matches…</option></select>
+      </div>
+    </section>
+
+    <div class="alert" id="error" role="alert" hidden>
+      <p id="error-text"></p>
+      <button type="button" class="btn" id="retry">Try again</button>
+    </div>
+
+    <section class="stage" id="stage" aria-busy="true" aria-labelledby="match-title">
+      <div class="match-head">
+        <h2 id="match-title">Loading match…</h2>
+        <p class="meta" id="match-meta"></p>
+      </div>
+
+      <div class="stage-grid">
+        <div class="col">
+          <div class="board">
+            <div class="team" id="side-1">
+              <span class="swatch"></span>
+              <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
+              <span class="team-prob"></span>
+            </div>
+            <div class="team" id="side-2">
+              <span class="swatch"></span>
+              <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
+              <span class="team-prob"></span>
+            </div>
+            <div class="probbar" id="probbar" aria-hidden="true"><span></span></div>
+            <p class="situation" id="situation"></p>
+            <div class="ball-row">
+              <p class="this-ball" id="this-ball"></p>
+              <ol class="recent" id="recent" aria-label="Recent deliveries"></ol>
+            </div>
+            <p class="result" id="result" hidden></p>
+          </div>
+
+          <div class="transport" role="group" aria-label="Replay controls">
+            <button type="button" class="btn icon" id="to-start" aria-label="First ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h2v14H5zM19 5v14L8 12z"/></svg>
+            </button>
+            <button type="button" class="btn icon" id="back" aria-label="Previous ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6v12l-8-6z"/></svg>
+            </button>
+            <button type="button" class="btn icon primary" id="play" aria-label="Play">
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+            </button>
+            <button type="button" class="btn icon" id="forward" aria-label="Next ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12l8-6z"/></svg>
+            </button>
+            <button type="button" class="btn icon" id="to-end" aria-label="Last ball">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5h2v14h-2zM5 5v14l11-7z"/></svg>
+            </button>
+            <button type="button" class="btn text" id="to-chase">Jump to chase</button>
+            <label class="speed">Speed
+              <select id="speed">
+                <option value="1">1 ball/s</option>
+                <option value="3" selected>3 balls/s</option>
+                <option value="8">8 balls/s</option>
+                <option value="20">20 balls/s</option>
+              </select>
+            </label>
+          </div>
+          <div class="scrub">
+            <input type="range" id="scrubber" min="0" max="0" value="0" aria-label="Delivery">
+            <span class="position" id="position"></span>
+          </div>
+          <p class="hint">Space plays or pauses · ← → step one ball · hold Shift to move six</p>
+
+          <figure class="chart-fig">
+            <figcaption>
+              <h3>Win probability</h3>
+              <span class="meta">Click or drag the chart to jump to any ball</span>
+            </figcaption>
+            <svg id="chart" role="img" aria-label="Win probability for each side across the match"></svg>
+          </figure>
+        </div>
+
+        <div class="col">
+          <figure class="heat-fig">
+            <figcaption>
+              <h3>Chase difficulty</h3>
+              <span class="meta" id="heat-caption"></span>
+            </figcaption>
+            <div class="heat-controls">
+              <label for="wickets">Wickets in hand <output id="wickets-out" for="wickets">10</output></label>
+              <input type="range" id="wickets" min="1" max="10" value="10">
+              <label class="check"><input type="checkbox" id="follow" checked> Follow the match</label>
+            </div>
+            <div class="heat-wrap" id="heat-wrap">
+              <canvas id="heatmap" role="img"
+                aria-label="Chase win probability for every combination of runs required and balls remaining"></canvas>
+            </div>
+            <div class="legend">
+              <span id="legend-1"></span>
+              <span class="legend-ramp" aria-hidden="true"></span>
+              <span id="legend-2"></span>
+            </div>
+            <p class="readout" id="readout"></p>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="whatif" aria-labelledby="whatif-title">
+      <div class="whatif-head">
+        <h2 id="whatif-title">What if?</h2>
+        <p class="meta">Describe any IPL situation and the model estimates who wins from there.</p>
+      </div>
+
+      <div class="whatif-grid">
+        <form class="whatif-form" id="whatif-form" novalidate>
+          <fieldset class="segmented">
+            <legend>Innings</legend>
+            <div class="segmented-options">
+              <label><input type="radio" name="innings" value="1"> Batting first</label>
+              <label><input type="radio" name="innings" value="2" checked> Chasing</label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="wi-venue">Venue</label>
+            <select id="wi-venue" name="venue"><option value="">Any venue (league par)</option></select>
+          </div>
+
+          <div class="whatif-fields">
+            <div class="field">
+              <label for="wi-runs">Runs</label>
+              <input id="wi-runs" name="runs" type="number" inputmode="numeric" min="0" max="400" value="120"
+                aria-describedby="wi-runs-error">
+              <p class="field-error" id="wi-runs-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="wi-wickets">Wickets down</label>
+              <input id="wi-wickets" name="wickets" type="number" inputmode="numeric" min="0" max="10" value="3"
+                aria-describedby="wi-wickets-error">
+              <p class="field-error" id="wi-wickets-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="wi-overs">Overs bowled</label>
+              <input id="wi-overs" name="overs" type="text" inputmode="decimal" value="14.2" autocomplete="off"
+                aria-describedby="wi-overs-hint wi-overs-error">
+              <p class="field-hint" id="wi-overs-hint">14.2 means 14 overs and 2 balls</p>
+              <p class="field-error" id="wi-overs-error" hidden></p>
+            </div>
+            <div class="field" id="wi-target-field">
+              <label for="wi-target">Target</label>
+              <input id="wi-target" name="target" type="number" inputmode="numeric" min="1" max="400" value="185"
+                aria-describedby="wi-target-error">
+              <p class="field-error" id="wi-target-error" hidden></p>
+            </div>
+          </div>
+
+          <button type="button" class="btn" id="wi-from-replay" disabled>Copy the replay's current ball</button>
+        </form>
+
+        <div class="whatif-result" id="whatif-result" data-state="loading" aria-live="polite">
+          <div class="whatif-sides">
+            <div class="whatif-side" id="wi-side-1">
+              <span class="eyebrow">Batting first</span>
+              <span class="whatif-prob" id="wi-p1">–</span>
+            </div>
+            <div class="whatif-side" id="wi-side-2">
+              <span class="eyebrow">Chasing</span>
+              <span class="whatif-prob" id="wi-p2">–</span>
+            </div>
+          </div>
+          <div class="probbar" id="wi-bar" aria-hidden="true"><span></span></div>
+          <p class="whatif-summary" id="wi-summary">Working out the odds…</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="model" aria-labelledby="model-title">
+      <h2 id="model-title">Model card</h2>
+      <p class="meta" id="split">Loading model metrics…</p>
+      <div class="model-grid" id="model-grid"></div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    Ball-by-ball data from <a href="https://cricsheet.org">Cricsheet</a>.
+    Probabilities are model estimates from historical IPL matches.
+  </footer>
+</body>
+</html>
