@@ -1,0 +1,21 @@
+{
+  "k": 16,
+  "season_carry": 1.0,
+  "test_start": "2026-01-01",
+  "all_competitions": {
+    "matches": 462,
+    "log_loss": 0.6809,
+    "brier": 0.2435,
+    "auc": 0.6019,
+    "ece": 0.0592,
+    "coin_flip_log_loss": 0.6931
+  },
+  "ipl": {
+    "matches": 71,
+    "log_loss": 0.6886,
+    "brier": 0.2478,
+    "auc": 0.5017,
+    "ece": 0.1492,
+    "coin_flip_log_loss": 0.6931
+  }
+}

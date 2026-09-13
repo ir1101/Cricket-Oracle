@@ -32,11 +32,12 @@
       "ipl": 984
     },
     "other_weight": 0.0,
-    "competition_feature": false
+    "competition_feature": false,
+    "match_weighted": true
   },
   "innings": {
     "1": {
-      "blend_weight": 0.30000000000000004,
+      "blend_weight": 0.25,
       "gbm_trees": 59,
       "matches": {
         "train": 984,
@@ -50,34 +51,241 @@
       },
       "test": {
         "logistic": {
-          "log_loss": 0.6953,
-          "brier": 0.247,
-          "auc": 0.7038,
-          "ece": 0.2001
+          "log_loss": 0.6925,
+          "brier": 0.2459,
+          "auc": 0.7042,
+          "ece": 0.1974
         },
         "gbm": {
-          "log_loss": 0.6432,
-          "brier": 0.2264,
-          "auc": 0.6819,
-          "ece": 0.115
+          "log_loss": 0.6423,
+          "brier": 0.226,
+          "auc": 0.6816,
+          "ece": 0.1141
         },
         "blend": {
-          "log_loss": 0.671,
-          "brier": 0.2383,
-          "auc": 0.7004,
-          "ece": 0.1744
+          "log_loss": 0.672,
+          "brier": 0.2386,
+          "auc": 0.7013,
+          "ece": 0.1763
         },
         "calibrated": {
-          "log_loss": 0.6805,
-          "brier": 0.2385,
-          "auc": 0.7004,
-          "ece": 0.1581
+          "log_loss": 0.6794,
+          "brier": 0.238,
+          "auc": 0.7013,
+          "ece": 0.1583
         }
+      },
+      "reliability": {
+        "logistic": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "n": 69,
+            "predicted": 0.0697,
+            "observed": 0.0
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 381,
+            "predicted": 0.1563,
+            "observed": 0.0315
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 523,
+            "predicted": 0.2479,
+            "observed": 0.1147
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 837,
+            "predicted": 0.3536,
+            "observed": 0.2378
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 1076,
+            "predicted": 0.4527,
+            "observed": 0.1933
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 2058,
+            "predicted": 0.552,
+            "observed": 0.3319
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 1652,
+            "predicted": 0.6478,
+            "observed": 0.4885
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 1173,
+            "predicted": 0.7475,
+            "observed": 0.5703
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 908,
+            "predicted": 0.8466,
+            "observed": 0.5154
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "n": 178,
+            "predicted": 0.9253,
+            "observed": 0.7865
+          }
+        ],
+        "gbm": [
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 303,
+            "predicted": 0.1924,
+            "observed": 0.0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 1172,
+            "predicted": 0.2444,
+            "observed": 0.192
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 438,
+            "predicted": 0.3577,
+            "observed": 0.2009
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 4075,
+            "predicted": 0.4672,
+            "observed": 0.3384
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 820,
+            "predicted": 0.5542,
+            "observed": 0.5598
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 1205,
+            "predicted": 0.6579,
+            "observed": 0.5469
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 842,
+            "predicted": 0.7063,
+            "observed": 0.5178
+          }
+        ],
+        "calibrated": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "n": 445,
+            "predicted": 0.0665,
+            "observed": 0.0292
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 660,
+            "predicted": 0.1469,
+            "observed": 0.1424
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 670,
+            "predicted": 0.2496,
+            "observed": 0.2403
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 729,
+            "predicted": 0.3553,
+            "observed": 0.1866
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 1338,
+            "predicted": 0.4567,
+            "observed": 0.2608
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 1654,
+            "predicted": 0.5473,
+            "observed": 0.4111
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 1068,
+            "predicted": 0.6486,
+            "observed": 0.4869
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 920,
+            "predicted": 0.7522,
+            "observed": 0.6076
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 1011,
+            "predicted": 0.8532,
+            "observed": 0.4659
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "n": 360,
+            "predicted": 0.9211,
+            "observed": 0.7306
+          }
+        ]
+      },
+      "served": {
+        "recipe": "tuned",
+        "trained_through": 2024,
+        "calibrated_on": [
+          2025,
+          2026
+        ],
+        "blend_weight": 0.6000000000000001,
+        "trees": 34
       }
     },
     "2": {
       "blend_weight": 0.30000000000000004,
-      "gbm_trees": 180,
+      "gbm_trees": 173,
       "matches": {
         "train": 984,
         "val": 140,
@@ -90,30 +298,555 @@
       },
       "test": {
         "logistic": {
-          "log_loss": 0.3487,
-          "brier": 0.1101,
-          "auc": 0.9479,
-          "ece": 0.118
+          "log_loss": 0.3408,
+          "brier": 0.1072,
+          "auc": 0.9483,
+          "ece": 0.1116
         },
         "gbm": {
-          "log_loss": 0.413,
-          "brier": 0.137,
-          "auc": 0.9043,
-          "ece": 0.1146
+          "log_loss": 0.4015,
+          "brier": 0.1327,
+          "auc": 0.9071,
+          "ece": 0.1048
         },
         "blend": {
-          "log_loss": 0.3587,
-          "brier": 0.114,
-          "auc": 0.941,
-          "ece": 0.1194
+          "log_loss": 0.3497,
+          "brier": 0.1106,
+          "auc": 0.9421,
+          "ece": 0.1119
         },
         "calibrated": {
-          "log_loss": 0.3455,
-          "brier": 0.1114,
-          "auc": 0.941,
-          "ece": 0.1062
+          "log_loss": 0.3429,
+          "brier": 0.1104,
+          "auc": 0.9421,
+          "ece": 0.1061
         }
+      },
+      "reliability": {
+        "logistic": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "n": 1470,
+            "predicted": 0.039,
+            "observed": 0.0204
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 713,
+            "predicted": 0.1443,
+            "observed": 0.2076
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 475,
+            "predicted": 0.2501,
+            "observed": 0.3263
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 547,
+            "predicted": 0.3491,
+            "observed": 0.4936
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 544,
+            "predicted": 0.453,
+            "observed": 0.6801
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 626,
+            "predicted": 0.5479,
+            "observed": 0.7971
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 546,
+            "predicted": 0.6503,
+            "observed": 0.8498
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 645,
+            "predicted": 0.7501,
+            "observed": 0.9364
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 955,
+            "predicted": 0.8565,
+            "observed": 0.9958
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "n": 1561,
+            "predicted": 0.9537,
+            "observed": 1.0
+          }
+        ],
+        "gbm": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "n": 1235,
+            "predicted": 0.0571,
+            "observed": 0.0097
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 847,
+            "predicted": 0.1447,
+            "observed": 0.1806
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 540,
+            "predicted": 0.2469,
+            "observed": 0.637
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 456,
+            "predicted": 0.3426,
+            "observed": 0.6974
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 414,
+            "predicted": 0.4502,
+            "observed": 0.5797
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 513,
+            "predicted": 0.5492,
+            "observed": 0.5906
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 698,
+            "predicted": 0.6563,
+            "observed": 0.7751
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 1087,
+            "predicted": 0.7469,
+            "observed": 0.8096
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 839,
+            "predicted": 0.851,
+            "observed": 0.9666
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "n": 1453,
+            "predicted": 0.9548,
+            "observed": 0.9979
+          }
+        ],
+        "calibrated": [
+          {
+            "lo": 0.0,
+            "hi": 0.1,
+            "n": 1721,
+            "predicted": 0.0376,
+            "observed": 0.0296
+          },
+          {
+            "lo": 0.1,
+            "hi": 0.2,
+            "n": 597,
+            "predicted": 0.1452,
+            "observed": 0.2513
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.3,
+            "n": 380,
+            "predicted": 0.2502,
+            "observed": 0.4579
+          },
+          {
+            "lo": 0.3,
+            "hi": 0.4,
+            "n": 520,
+            "predicted": 0.3522,
+            "observed": 0.5923
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.5,
+            "n": 497,
+            "predicted": 0.4514,
+            "observed": 0.6519
+          },
+          {
+            "lo": 0.5,
+            "hi": 0.6,
+            "n": 577,
+            "predicted": 0.5495,
+            "observed": 0.747
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.7,
+            "n": 573,
+            "predicted": 0.6503,
+            "observed": 0.8394
+          },
+          {
+            "lo": 0.7,
+            "hi": 0.8,
+            "n": 611,
+            "predicted": 0.7496,
+            "observed": 0.8903
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.9,
+            "n": 783,
+            "predicted": 0.8563,
+            "observed": 0.9796
+          },
+          {
+            "lo": 0.9,
+            "hi": 1.0,
+            "n": 1823,
+            "predicted": 0.9596,
+            "observed": 0.9995
+          }
+        ]
+      },
+      "served": {
+        "recipe": "refit",
+        "trained_through": 2026,
+        "calibrated_on": [
+          2025,
+          2026
+        ],
+        "blend_weight": 0.15000000000000002,
+        "trees": 120
       }
     }
+  },
+  "served": {
+    "1": {
+      "recipe": "tuned",
+      "trained_through": 2024,
+      "calibrated_on": [
+        2025,
+        2026
+      ],
+      "blend_weight": 0.6000000000000001,
+      "trees": 34
+    },
+    "2": {
+      "recipe": "refit",
+      "trained_through": 2026,
+      "calibrated_on": [
+        2025,
+        2026
+      ],
+      "blend_weight": 0.15000000000000002,
+      "trees": 120
+    }
+  },
+  "confidence": {
+    "seasons": [
+      2024,
+      2025,
+      2026
+    ],
+    "stages": [
+      {
+        "innings": 1,
+        "from_over": 0,
+        "to_over": 6,
+        "matches": 211,
+        "accuracy": 0.597,
+        "brier": 0.2372,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 210,
+            "accuracy": 0.568,
+            "brier": 0.2452
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 172,
+            "accuracy": 0.669,
+            "brier": 0.2199
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 65,
+            "accuracy": 0.692,
+            "brier": 0.2241
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 4,
+            "accuracy": 0.75,
+            "brier": 0.2089
+          }
+        ]
+      },
+      {
+        "innings": 1,
+        "from_over": 6,
+        "to_over": 12,
+        "matches": 211,
+        "accuracy": 0.643,
+        "brier": 0.2224,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 132,
+            "accuracy": 0.572,
+            "brier": 0.242
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 161,
+            "accuracy": 0.67,
+            "brier": 0.2175
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 90,
+            "accuracy": 0.722,
+            "brier": 0.2093
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 17,
+            "accuracy": 0.824,
+            "brier": 0.1487
+          }
+        ]
+      },
+      {
+        "innings": 1,
+        "from_over": 12,
+        "to_over": 20,
+        "matches": 210,
+        "accuracy": 0.717,
+        "brier": 0.1967,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 111,
+            "accuracy": 0.613,
+            "brier": 0.2386
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 152,
+            "accuracy": 0.705,
+            "brier": 0.2047
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 122,
+            "accuracy": 0.787,
+            "brier": 0.1746
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 45,
+            "accuracy": 0.889,
+            "brier": 0.0992
+          }
+        ]
+      },
+      {
+        "innings": 2,
+        "from_over": 0,
+        "to_over": 6,
+        "matches": 211,
+        "accuracy": 0.77,
+        "brier": 0.1609,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 106,
+            "accuracy": 0.607,
+            "brier": 0.2404
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 160,
+            "accuracy": 0.722,
+            "brier": 0.1975
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 162,
+            "accuracy": 0.811,
+            "brier": 0.1495
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 82,
+            "accuracy": 0.878,
+            "brier": 0.1088
+          }
+        ]
+      },
+      {
+        "innings": 2,
+        "from_over": 6,
+        "to_over": 12,
+        "matches": 211,
+        "accuracy": 0.827,
+        "brier": 0.1206,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 79,
+            "accuracy": 0.561,
+            "brier": 0.2438
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 119,
+            "accuracy": 0.75,
+            "brier": 0.189
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 138,
+            "accuracy": 0.862,
+            "brier": 0.1124
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 113,
+            "accuracy": 0.965,
+            "brier": 0.0349
+          }
+        ]
+      },
+      {
+        "innings": 2,
+        "from_over": 12,
+        "to_over": 16,
+        "matches": 204,
+        "accuracy": 0.874,
+        "brier": 0.0958,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 60,
+            "accuracy": 0.659,
+            "brier": 0.2342
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 89,
+            "accuracy": 0.754,
+            "brier": 0.188
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 117,
+            "accuracy": 0.866,
+            "brier": 0.112
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 133,
+            "accuracy": 0.962,
+            "brier": 0.0348
+          }
+        ]
+      },
+      {
+        "innings": 2,
+        "from_over": 16,
+        "to_over": 20,
+        "matches": 181,
+        "accuracy": 0.922,
+        "brier": 0.0569,
+        "by_band": [
+          {
+            "from": 0.0,
+            "to": 0.1,
+            "matches": 41,
+            "accuracy": 0.614,
+            "brier": 0.237
+          },
+          {
+            "from": 0.1,
+            "to": 0.25,
+            "matches": 59,
+            "accuracy": 0.77,
+            "brier": 0.1833
+          },
+          {
+            "from": 0.25,
+            "to": 0.4,
+            "matches": 98,
+            "accuracy": 0.889,
+            "brier": 0.0987
+          },
+          {
+            "from": 0.4,
+            "to": 0.5,
+            "matches": 172,
+            "accuracy": 0.98,
+            "brier": 0.0205
+          }
+        ]
+      }
+    ]
   }
 }

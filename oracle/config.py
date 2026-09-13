@@ -37,6 +37,30 @@ T20I_FULL_MEMBERS = {
     "New Zealand", "Pakistan", "South Africa", "Sri Lanka", "West Indies", "Zimbabwe",
 }
 
+# Live fixtures from CricketData.org (free tier: 100 calls a day). The key is read from the
+# CRICKETDATA_API_KEY environment variable or a local, git-ignored .env file.
+CRICKETDATA_URL = "https://api.cricapi.com/v1"
+FIXTURE_CACHE_PATH = ROOT / "data" / "cache" / "cricscore.json"
+FIXTURE_CACHE_MINUTES = 30
+# Series-name keywords -> competition code, used to look up team ratings for live fixtures.
+SERIES_COMPETITIONS = {
+    "indian premier league": "ipl",
+    "big bash": "bbl",
+    "pakistan super league": "psl",
+    "caribbean premier league": "cpl",
+    "bangladesh premier league": "bpl",
+    "sa20": "sa20",
+    "international league t20": "ilt20",
+    "major league cricket": "mlc",
+    "t20 blast": "blast",
+    "vitality blast": "blast",
+    "super smash": "super_smash",
+    "lanka premier league": "lpl",
+    "syed mushtaq ali": "smat",
+    "csa t20": "csa_t20",
+    "mzansi super league": "msl",
+}
+
 # How non-target matches enter training, chosen with `python -m oracle.train --compare-data`.
 # Validation log loss (mean of both innings): 0 -> 0.4857, 0.25 -> 0.4810, 1.0 -> 0.4826; the indicator
 # did not help. 0.25 then lost to 0 on the 2026 test season on every metric except chase calibration
@@ -44,8 +68,16 @@ T20I_FULL_MEMBERS = {
 OTHER_COMPETITION_WEIGHT = 0.0  # sample weight relative to a target-competition match; 0 drops them
 COMPETITION_FEATURE = False  # add an is_target indicator so models can learn a level shift
 
+# Pre-match Elo ratings. K and the between-season carry were chosen on 2024–25 matches from every
+# competition; the logistic scale is fitted on matches before PREMATCH_TEST_START.
+ELO_K = 16
+ELO_SEASON_CARRY = 1.0
+PREMATCH_TEST_START = "2026-01-01"
+PREMATCH_PATH = MODELS_DIR / "prematch.json"
+
 MATCHES_PATH = DATA_PROCESSED / "matches.parquet"
 DELIVERIES_PATH = DATA_PROCESSED / "deliveries.parquet"
+PLAYERS_PATH = DATA_PROCESSED / "players.parquet"  # playing XIs: match_id, team, order, player_id, player
 STATES_PATH = DATA_PROCESSED / "states.parquet"
 METRICS_PATH = REPORTS_DIR / "metrics.json"
 
@@ -78,6 +110,29 @@ MONOTONE = {
     1: {"balls_remaining": 1, "wickets_in_hand": 1, "runs": 1, "runs_vs_par": 1},
     2: {"balls_remaining": 1, "wickets_in_hand": 1, "runs_required": -1},
 }
+
+# Give every match the same total training weight instead of every delivery (long innings would
+# otherwise count for more). Walk-forward checkpoint Brier, 2024/2025/2026: 0.1628/0.1606/0.1723 by
+# delivery vs 0.1628/0.1596/0.1706 by match.
+MATCH_WEIGHTED = True
+
+# The app's "how sure is this?" notes: how often the favourite won, by match stage (innings, from over,
+# to over) and by how far the odds were from 50-50, predicting each of the latest seasons walk-forward.
+CONFIDENCE_SEASONS = 3
+CONFIDENCE_STAGES = [(1, 0, 6), (1, 6, 12), (1, 12, 20), (2, 0, 6), (2, 6, 12), (2, 12, 16), (2, 16, 20)]
+CONFIDENCE_BANDS = [0.0, 0.1, 0.25, 0.4, 0.5]
+
+# How each served model is built, chosen by walk-forward checkpoint Brier on 2024-26:
+#   "tuned": trained on seasons before the latest two, tuned and calibrated on those two.
+#   "refit": trained on every season; blend and calibrator re-learned from leave-one-season-out
+#            predictions for the latest two, so recent trends aren't counted twice.
+# Checkpoint Brier (ball 1 / 6 / 10 / 15 / 18-19 overs), tuned vs refit:
+#   chase         .1976/.1288/.1213/.0950/.0646  vs  .1956/.1263/.1200/.0929/.0621
+#   first innings .2473/.2283/.2211/.1991/.1924  vs  .2515/.2311/.2228/.2012/.1939
+# Refitting while keeping the old calibrator scored .2455/.2269/.2215/.2000/.1910 on the first innings but
+# double-counted recent trends: it gave the side batting first 27% at the first ball of the 2026 final.
+SERVED_RECIPE = {1: "tuned", 2: "refit"}
+SERVED_RECIPE = {1: "tuned", 2: "refit"}
 
 # Applied after stripping the city suffix and punctuation from Cricsheet venue names.
 VENUE_ALIASES = {

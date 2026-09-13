@@ -1,0 +1,9 @@
+{
+  "hero-1.jpg": { "focus": "50% 0%", "note": "Bat reaches the top-right corner, so this sits in a frame cut on the left." },
+  "hero-2.jpg": { "focus": "50% 55%", "note": "Keeps the head and both boots." },
+  "hero-3.jpg": { "focus": "8% 50%", "note": "Keeps the ball hand and the raised arm; the boots fall off the right edge." },
+  "spotlight.jpg": { "focus": "50% 56%", "note": "Floodlit roof ring and stands; the band crops most of the sky." },
+  "history.jpg": { "focus": "30% 40%", "note": "Celebrating keeper on the left, batter on the right." },
+  "upcoming.jpg": { "focus": "50% 55%", "note": "Stands and striped outfield." },
+  "calculator.jpg": { "focus": "50% 55%", "note": "Flying bails down to the ball." }
+}

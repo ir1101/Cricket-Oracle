@@ -29,6 +29,12 @@ def test_model_card(client):
     body = client.get("/api/model").json()
     assert set(body["innings"]) == {"1", "2"}
     assert body["venues"]
+    calibrated = body["innings"]["2"]["reliability"]["calibrated"]
+    assert calibrated and {"lo", "hi", "n", "predicted", "observed"} <= set(calibrated[0])
+    assert set(body["served"]) == {"1", "2"}
+    assert all(s["recipe"] in {"tuned", "refit"} and s["calibrated_on"] for s in body["served"].values())
+    stages = body["confidence"]["stages"]
+    assert stages and all({"innings", "from_over", "to_over", "accuracy", "matches", "by_band"} <= set(s) for s in stages)
 
 
 def test_replay_ends_with_the_actual_winner(client):
@@ -72,3 +78,36 @@ def test_predict_uses_the_venue_par(client):
 def test_predict_finished_chase(client):
     body = client.post("/api/predict", json={"innings": 2, "runs": 181, "balls": 100, "wickets": 4, "target": 180}).json()
     assert body["p_batting_side_wins"] == 1.0
+
+
+def test_stats(client):
+    body = client.get("/api/stats").json()
+    assert body["ipl_matches"] > 1000
+    assert body["ipl_deliveries"] > body["ipl_matches"]
+    assert 0.5 < body["chase_auc"] <= 1
+
+
+def test_images_lists_only_image_files(client):
+    body = client.get("/api/images").json()
+    assert all(item["name"].lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".avif")) for item in body["images"])
+
+
+@pytest.mark.parametrize("path", ["/", "/history", "/upcoming", "/calculator"])
+def test_pages_are_served(client, path):
+    response = client.get(path)
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+
+
+@pytest.mark.parametrize("path", ["/js/core.js", "/css/base.css", "/history"])
+def test_site_files_are_revalidated(client, path):
+    assert client.get(path).headers["cache-control"] == "no-cache"
+
+
+def test_upcoming_without_a_key_explains_setup(client, monkeypatch):
+    from oracle import fixtures
+
+    monkeypatch.setattr(fixtures, "api_key", lambda: None)
+    body = client.get("/api/upcoming").json()
+    assert body["status"] == "no_key"
+    assert body["matches"] == []

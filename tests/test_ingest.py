@@ -36,6 +36,25 @@ def test_parse_normalizes_names_and_describes_result():
     assert match["margin"] == "11 runs"
 
 
+def test_player_ids_and_playing_xis_are_kept():
+    match, rows = parse_match(1, load_fixture())
+
+    assert (rows[0]["batter_id"], rows[0]["bowler_id"], rows[0]["non_striker_id"]) == ("id-a", "id-x", "id-b")
+    assert rows[2]["player_out_id"] == "id-a"
+    assert rows[0]["player_out_id"] == ""
+    xi = [(p["team"], p["order"], p["player_id"]) for p in match["players"]]
+    assert len(xi) == 6
+    assert ("Royal Challengers Bengaluru", 0, "id-a") in xi
+    assert ("Punjab Kings", 2, "id-s") in xi
+
+
+def test_player_ids_fall_back_to_names_without_a_registry():
+    data = load_fixture()
+    del data["info"]["registry"]
+    _, rows = parse_match(1, data)
+    assert rows[0]["batter_id"] == "A"
+
+
 @pytest.mark.parametrize("outcome", [
     {"result": "no result"},
     {"result": "tie", "eliminator": "Kings XI Punjab"},

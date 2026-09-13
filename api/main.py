@@ -1,29 +1,52 @@
-"""FastAPI app: match replays, chase-difficulty heatmaps, and ad-hoc predictions.
+"""FastAPI app: the Cricket Oracle site, match replays, chase heatmaps, predictions and live fixtures.
 
     uvicorn api.main:app --reload
 """
 import json
 from contextlib import asynccontextmanager
+from urllib.parse import quote
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from oracle import config
+from oracle import config, fixtures
 from oracle.predict import Oracle
+from oracle.prematch import PrematchModel
 from oracle.replay import match_summary, replay
+
+PAGES = ("history", "upcoming", "calculator")
+IMAGES_DIR = config.WEB_DIR / "images"
+IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".webp", ".avif"}
 
 store = {}
 
 
 @asynccontextmanager
 async def lifespan(app):
-    store["oracle"] = Oracle.load()
     matches = pd.read_parquet(config.MATCHES_PATH)
-    store["matches"] = matches[matches["competition"] == config.TARGET_COMPETITION]
+    target = matches[matches["competition"] == config.TARGET_COMPETITION]
+    metrics = json.loads(config.METRICS_PATH.read_text())
+    prematch_report = config.REPORTS_DIR / "prematch.json"
+
+    store["oracle"] = Oracle.load()
+    store["matches"] = target
     store["states"] = pd.read_parquet(config.STATES_PATH)
-    store["metrics"] = json.loads(config.METRICS_PATH.read_text())
+    store["metrics"] = metrics
+    store["prematch"] = PrematchModel.load() if config.PREMATCH_PATH.exists() else None
+    store["prematch_report"] = json.loads(prematch_report.read_text()) if prematch_report.exists() else None
+    store["stats"] = {
+        "matches": len(matches),
+        "competitions": int(matches["competition"].nunique()),
+        "ipl_matches": len(target),
+        "ipl_deliveries": len(store["states"]),
+        "first_season": int(target["year"].min()),
+        "test_season": int(metrics["split"]["test"][-1]),
+        "chase_auc": metrics["innings"]["2"]["test"]["calibrated"]["auc"],
+        "first_innings_auc": metrics["innings"]["1"]["test"]["calibrated"]["auc"],
+    }
     yield
     store.clear()
 
@@ -31,10 +54,25 @@ async def lifespan(app):
 app = FastAPI(title="Cricket Oracle", lifespan=lifespan)
 
 
+@app.middleware("http")
+async def revalidate_site_files(request, call_next):
+    response = await call_next(request)
+    # Without this, browsers heuristically reuse stale JS and CSS after an update. no-cache still
+    # allows cheap 304 revalidation through the ETags StaticFiles already sends.
+    if not request.url.path.startswith("/api/"):
+        response.headers.setdefault("Cache-Control", "no-cache")
+    return response
+
+
 @app.get("/api/model")
 def model_info():
     oracle = store["oracle"]
     return {**store["metrics"], "league_par": oracle.league_par, "venues": oracle.venue_pars}
+
+
+@app.get("/api/stats")
+def stats():
+    return store["stats"]
 
 
 @app.get("/api/matches")
@@ -93,6 +131,29 @@ def predict(state: MatchState):
         "known_venue": state.venue in oracle.venue_pars,
     }
 
+
+@app.get("/api/upcoming")
+def upcoming():
+    # A plain def runs in the threadpool, so the blocking fixtures request never stalls the event loop.
+    return {**fixtures.upcoming(store["prematch"], store["oracle"]), "prematch_report": store["prematch_report"]}
+
+
+@app.get("/api/images")
+def images():
+    """Photos dropped into web/images, for the page's photo slots."""
+    files = sorted(p for p in IMAGES_DIR.glob("*") if p.suffix.lower() in IMAGE_TYPES) if IMAGES_DIR.exists() else []
+    return {"images": [{"name": p.name, "url": f"/images/{quote(p.name)}"} for p in files]}
+
+
+def serve_page(name):
+    def page():
+        return FileResponse(config.WEB_DIR / f"{name}.html")
+
+    return page
+
+
+for page_name in PAGES:
+    app.get(f"/{page_name}", include_in_schema=False)(serve_page(page_name))
 
 app.mount("/reports", StaticFiles(directory=config.REPORTS_DIR), name="reports")
 app.mount("/", StaticFiles(directory=config.WEB_DIR, html=True), name="web")

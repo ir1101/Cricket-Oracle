@@ -2,9 +2,16 @@
 
 A match-outcome predictor for T20 cricket, trained on every IPL match from 2008 to 2026.
 It turns ball-by-ball data into innings-state features and blends a logistic baseline with a
-monotone gradient-boosted model. Calibrated win probabilities drive a replay of any match with a
-chase-difficulty heatmap that updates ball by ball. A what-if calculator gives the odds for any
-situation you type in (score, overs, wickets, target, venue).
+monotone gradient-boosted model.
+
+The site has three sections:
+
+- **History** (`/history`) replays any IPL match with ball-by-ball win probability and a
+  chase-difficulty heatmap.
+- **Upcoming** (`/upcoming`) lists men's T20 fixtures for the next seven days from CricketData.org.
+  Pre-match odds come from Elo team ratings; in-play odds take over once a match is live.
+- **Calculator** (`/calculator`) gives the odds for any situation you type in, plus the chase map for
+  that target.
 
 ## Quick start
 
@@ -16,9 +23,23 @@ pip install -r requirements.txt
 python -m oracle.ingest            # download 15 Cricsheet T20 archives (~40 MB) -> data/processed/*.parquet
 python -m oracle.train --compare-data   # optional: re-check how much weight non-IPL matches get
 python -m oracle.train             # features, both innings models, reports/metrics.json
+python -m oracle.prematch          # Elo team ratings for upcoming fixtures, reports/prematch.json
 uvicorn api.main:app               # then open http://localhost:8000
-python -m pytest                   # 26 tests
+python -m pytest                   # 67 tests
 ```
+
+For live fixtures, get a free key from [CricketData.org](https://cricketdata.org) and put it in a
+`.env` file in the project folder (it is git-ignored):
+
+```
+CRICKETDATA_API_KEY=your-key-here
+```
+
+Without a key, the Upcoming page explains how to add one. The free tier allows 100 calls a day, so
+the server caches the fixture feed for 30 minutes in `data/cache/`.
+
+Photos go in `web/images/`. A file name starting with `hero`, `spotlight`, `history`, `upcoming`,
+`calculator` or `gallery` goes to that slot; other images fill the remaining slots in page order.
 
 ## How it works
 
@@ -27,22 +48,49 @@ python -m pytest                   # 26 tests
 | Ingest | `oracle/ingest.py` | Parses Cricsheet JSON for the IPL and 14 other men's T20 competitions and counts legal balls (wides and no-balls are not legal). Retired batters do not cost a wicket. Venue and franchise names are merged across renames and competitions. D/L results, ties, no-results, non-20-over matches, and T20Is not between two full members are dropped. |
 | Features | `oracle/features.py` | One row per delivery. Covers balls remaining, wickets in hand, current run rate, run rate and wickets over the last 30 legal balls, and venue par. Chase rows add runs required, required rate and target. Scores are also restated relative to par. |
 | Venue par | `oracle/features.py` | A recency-weighted scoring level for each competition plus the venue's shrunk offset from it. Offsets are pooled across every competition played at the ground. It is built only from earlier matches, so it never leaks the result. |
-| Models | `oracle/models.py` | Logistic regression plus LightGBM with monotone constraints (more runs required never helps the chase; more balls or wickets never hurts). Recent seasons carry more training weight. The blend weight and Platt calibration are tuned on the validation seasons. |
+| Models | `oracle/models.py` | Logistic regression plus LightGBM with monotone constraints (more runs required never helps the chase; more balls or wickets never hurts). Recent seasons carry more training weight. The blend weight and Platt calibration are tuned on the validation seasons. The served chase model is retrained on every season through the latest, then its blend and calibration are re-learned from leave-one-season-out predictions for the two latest seasons. The served first-innings model is trained on earlier seasons and calibrated on the two latest, without a refit, because that scored better walk-forward. (Refitting while keeping the old calibrator counts recent trends twice.) |
 | Split | `oracle/config.py` | By season, never at random. Train 2008–2023, validate 2024–2025, test 2026. |
-| Serve | `api/main.py` | FastAPI serves replays, heatmap grids and ad-hoc predictions, plus the static page in `web/`. |
+| Confidence | `oracle/train.py` | Each of the latest three seasons is predicted by a model trained only on earlier seasons. The app shows how often the favourite won at that stage of a match and at that distance from 50-50. |
+| Pre-match | `oracle/prematch.py` | Elo ratings per team within each competition (K = 16), turned into a probability by a logistic fit on the rating gap. |
+| Fixtures | `oracle/fixtures.py` | Reads the CricketData.org `cricScore` feed, keeps men's T20s, attaches pre-match odds, and reads live score strings into in-play odds. |
+| Serve | `api/main.py` | FastAPI serves the API and the site in `web/`: a landing page plus the History, Upcoming and Calculator pages, sharing `web/css/base.css` and `web/js/core.js`. |
 
 ## Results on the 2026 test season
 
 | | Log loss | Brier | AUC | Calibration error |
 |---|---|---|---|---|
-| **Chase**: logistic | 0.349 | 0.110 | 0.948 | 11.8% |
-| **Chase**: gradient-boosted | 0.413 | 0.137 | 0.904 | 11.5% |
-| **Chase**: calibrated blend (shipped) | 0.346 | 0.111 | 0.941 | 10.6% |
-| **First innings**: logistic | 0.695 | 0.247 | 0.704 | 20.0% |
-| **First innings**: gradient-boosted | 0.643 | 0.226 | 0.682 | 11.5% |
-| **First innings**: calibrated blend (shipped) | 0.681 | 0.239 | 0.700 | 15.8% |
+| **Chase**: logistic | 0.341 | 0.107 | 0.948 | 11.2% |
+| **Chase**: gradient-boosted | 0.402 | 0.133 | 0.907 | 10.5% |
+| **Chase**: calibrated blend | 0.343 | 0.110 | 0.942 | 10.6% |
+| **First innings**: logistic | 0.693 | 0.246 | 0.704 | 19.7% |
+| **First innings**: gradient-boosted | 0.642 | 0.226 | 0.682 | 11.4% |
+| **First innings**: calibrated blend | 0.679 | 0.238 | 0.701 | 15.8% |
 
-Reliability plots are saved in `reports/`.
+These scores come from a model trained on 2008–2023 and never shown 2026. The app serves newer models
+built as described under Models above: the chase model has seen every season through 2026, and the
+first-innings model is calibrated on 2025–26. Reliability plots are saved in `reports/`, and the site's
+model card draws them interactively.
+
+### How sure is it?
+
+Share of matches the favourite went on to win. Each of 2024, 2025 and 2026 was predicted by a model
+trained only on earlier seasons, and every match counts once per stage. The app shows the matching
+row next to its odds.
+
+| Stage | Favourite won | Odds within 10 points of 50-50 | Favourite 25+ points clear |
+|---|---|---|---|
+| First innings, overs 0–6 | 60% | 57% | 69% |
+| First innings, overs 6–12 | 64% | 57% | 73% |
+| First innings, overs 12–20 | 72% | 61% | 80% |
+| Chase, overs 0–6 | 77% | 61% | 82% |
+| Chase, overs 6–12 | 83% | 56% | 89% |
+| Chase, overs 12–16 | 87% | 66% | 92% |
+| Chase, overs 16–20 | 92% | 61% | 95% |
+
+Early odds are genuinely uncertain. Two alternatives were tested walk-forward and neither beat this
+model overall: a ball-by-ball simulation (better only in the last overs of a chase) and player-aware
+features such as XI strength, set batters and bowling left (better only at the start of a chase).
+Weighting every match equally in training gave a small, consistent gain and is switched on.
 
 ### Known limitations
 
@@ -50,9 +98,9 @@ Reliability plots are saved in `reports/`.
   the three seasons before. No model fitted before the season could have expected that. It is
   the main reason calibration error on the test season is 11–17%. The models rank situations well
   (chase AUC 0.94) but underrate chasing sides in 2026.
-- **Blend weights are tuned on validation, not on 2026.** The blend gives the GBM 30% in both
-  innings. On 2026 the first-innings GBM alone would have scored better (log loss 0.643); it was not
-  re-tuned.
+- **Blend weights are tuned on validation, not on 2026.** The evaluated blend gives the GBM 25% for
+  the first innings and 30% for the chase. On 2026 the first-innings GBM alone would have scored
+  better (log loss 0.642); it was not re-tuned.
 - **Other T20 competitions are ingested but not used for training.** Weighting them at 0.25 of an IPL
   match won narrowly on the 2024–25 validation seasons (mean log loss 0.481 vs 0.486). On 2026 it
   did worse on every metric except chase calibration error (chase log loss 0.355 vs 0.346), so the
@@ -62,7 +110,13 @@ Reliability plots are saved in `reports/`.
 - **Heatmap cells and what-if situations are hypothetical states.** Their recent-form features
   assume the innings has gone at an even pace. Replay probabilities use the real ball-by-ball
   history, so the same score can get a slightly different number in the replay.
-- Replay only. There is no live score feed yet.
+- **Pre-match odds are weak.** On 2026 matches they never saw, Elo ratings score log loss 0.681
+  against 0.693 for a coin toss (AUC 0.60, 462 matches, all competitions). For the IPL the AUC is
+  0.50, no better than a coin toss. Auctions reshuffle squads, so past results say little. The
+  Upcoming page shows these numbers next to the in-play model.
+- **Live odds for non-IPL matches use the IPL-trained model**, so treat them as a guide.
+- **The fixture parser is built from CricketData.org's documented fields.** The `cricScore` feed
+  itself isn't fully documented, so check the Upcoming page after adding a key.
 
 ## API
 
@@ -73,6 +127,9 @@ Reliability plots are saved in `reports/`.
 | `GET /api/heatmap?target=&wickets=&venue=&max_balls=` | P(chase succeeds) for each runs-required × balls-remaining cell; `null` marks unreachable states |
 | `POST /api/predict` | `{innings, runs, balls, wickets, target?, venue?}` → `p_batting_side_wins`, `venue_par`, `known_venue` (unknown venues fall back to the league par) |
 | `GET /api/model` | Test metrics, split, blend weights, venue pars |
+| `GET /api/stats` | Headline numbers for the landing page |
+| `GET /api/upcoming` | `status` (`ok`, `no_key` or `error`), fixtures with `prematch` and `live` odds, and the pre-match test report |
+| `GET /api/images` | Photos found in `web/images/` |
 
 ## Data
 

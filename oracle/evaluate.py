@@ -23,6 +23,23 @@ def expected_calibration_error(y, p, bins=10):
     ))
 
 
+def reliability_bins(y, p, bins=10):
+    """Mean prediction and observed win rate for each probability band that has any rows."""
+    y, p = np.asarray(y, dtype=float), np.asarray(p, dtype=float)
+    idx = _bin_index(p, bins)
+    return [
+        {
+            "lo": round(b / bins, 2),
+            "hi": round((b + 1) / bins, 2),
+            "n": int((idx == b).sum()),
+            "predicted": round(float(p[idx == b].mean()), 4),
+            "observed": round(float(y[idx == b].mean()), 4),
+        }
+        for b in range(bins)
+        if (idx == b).any()
+    ]
+
+
 def score(y, p):
     y = np.asarray(y)
     p = np.clip(np.asarray(p, dtype=float), 1e-6, 1 - 1e-6)

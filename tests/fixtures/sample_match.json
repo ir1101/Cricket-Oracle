@@ -9,7 +9,14 @@
     "outcome": {"winner": "Royal Challengers Bangalore", "by": {"runs": 11}},
     "event": {"name": "Indian Premier League", "match_number": 7},
     "overs": 20,
-    "season": 2024
+    "season": 2024,
+    "players": {
+      "Royal Challengers Bangalore": ["A", "B", "C"],
+      "Kings XI Punjab": ["P", "R", "S"]
+    },
+    "registry": {
+      "people": {"A": "id-a", "B": "id-b", "C": "id-c", "X": "id-x", "P": "id-p", "Q": "id-q", "R": "id-r", "S": "id-s"}
+    }
   },
   "innings": [
     {

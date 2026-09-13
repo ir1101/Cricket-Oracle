@@ -70,6 +70,12 @@ def parse_match(match_id, data, competition=config.TARGET_COMPETITION):
     if len(innings) != 2:
         return None
 
+    # The registry gives stable player IDs; names alone collide (Cricsheet has two "Mohsin Khan"s).
+    people = (info.get("registry") or {}).get("people") or {}
+
+    def player_id(name):
+        return people.get(name, name)
+
     rows = []
     totals = []
     for number, inn in enumerate(innings, start=1):
@@ -91,6 +97,9 @@ def parse_match(match_id, data, competition=config.TARGET_COMPETITION):
                     "label": f"{over['over']}.{legal_in_over if legal else legal_in_over + 1}",
                     "batter": d["batter"],
                     "bowler": d["bowler"],
+                    "batter_id": player_id(d["batter"]),
+                    "bowler_id": player_id(d["bowler"]),
+                    "non_striker_id": player_id(d.get("non_striker", "")),
                     "ball_runs": d["runs"]["total"],
                     "batter_runs": d["runs"]["batter"],
                     "extra_type": next(iter(extras), ""),
@@ -98,6 +107,7 @@ def parse_match(match_id, data, competition=config.TARGET_COMPETITION):
                     "wicket": len(wickets),
                     "wicket_kind": wickets[0]["kind"] if wickets else "",
                     "player_out": wickets[0]["player_out"] if wickets else "",
+                    "player_out_id": player_id(wickets[0]["player_out"]) if wickets else "",
                 })
                 seq += 1
                 total += d["runs"]["total"]
@@ -121,13 +131,19 @@ def parse_match(match_id, data, competition=config.TARGET_COMPETITION):
         "first_innings_total": totals[0],
         "target_runs": target.get("runs", totals[0] + 1),
         "max_balls": overs_to_balls(target["overs"]) if "overs" in target else config.BALLS_PER_INNINGS,
+        # Popped into their own table by build_tables.
+        "players": [
+            {"match_id": match_id, "team": normalize_team(team), "order": order, "player_id": player_id(name), "player": name}
+            for team, xi in (info.get("players") or {}).items()
+            for order, name in enumerate(xi)
+        ],
     }
     return match, rows
 
 
 def build_tables(archives):
-    """Parse {competition: zip path} into match and delivery tables, plus per-competition counts."""
-    match_frames, delivery_frames, counts, seen = [], [], {}, set()
+    """Parse {competition: zip path} into match, delivery and playing-XI tables, plus per-competition counts."""
+    match_frames, delivery_frames, player_rows, counts, seen = [], [], [], {}, set()
     for competition, path in archives.items():
         matches, deliveries, excluded = [], [], 0
         with zipfile.ZipFile(path) as archive:
@@ -140,6 +156,7 @@ def build_tables(archives):
                     excluded += 1
                     continue
                 seen.add(match_id)
+                player_rows.extend(parsed[0].pop("players"))
                 matches.append(parsed[0])
                 deliveries.extend(parsed[1])
         counts[competition] = {"kept": len(matches), "excluded": excluded}
@@ -149,7 +166,8 @@ def build_tables(archives):
 
     matches = pd.concat(match_frames, ignore_index=True).sort_values(["date", "match_id"], ignore_index=True)
     deliveries = pd.concat(delivery_frames, ignore_index=True).sort_values(["match_id", "innings", "seq"], ignore_index=True)
-    return matches, deliveries, counts
+    players = pd.DataFrame(player_rows, columns=["match_id", "team", "order", "player_id", "player"])
+    return matches, deliveries, players, counts
 
 
 def main():
@@ -162,10 +180,11 @@ def main():
         parser.error(f"--competitions must include the target competition, {config.TARGET_COMPETITION}")
 
     archives = {competition: download(competition, args.force) for competition in args.competitions}
-    matches, deliveries, counts = build_tables(archives)
+    matches, deliveries, players, counts = build_tables(archives)
     config.DATA_PROCESSED.mkdir(parents=True, exist_ok=True)
     matches.to_parquet(config.MATCHES_PATH, index=False)
     deliveries.to_parquet(config.DELIVERIES_PATH, index=False)
+    players.to_parquet(config.PLAYERS_PATH, index=False)
 
     for competition, n in counts.items():
         print(f"  {competition:<12} {n['kept']:>5} kept {n['excluded']:>5} excluded")
