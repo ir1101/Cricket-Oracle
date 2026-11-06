@@ -19,7 +19,11 @@ SAMPLE = {
         {"id": "live-1", "dateTimeGMT": "2026-09-14T13:00:00", "matchType": "t20", "ms": "live",
          "status": "Mumbai Indians need 40 runs in 24 balls", "t1": "Mumbai Indians [MI]",
          "t2": "Chennai Super Kings [CSK]", "t1s": "150/6 (16)", "t2s": "189/5 (20)",
-         "series": "Indian Premier League 2027"},
+         "t1img": "https://g.cricapi.com/iapi/226.png?w=48", "series": "Indian Premier League 2027"},
+        {"id": "women-1", "dateTimeGMT": "2026-09-15T08:00:00", "matchType": "t20", "ms": "fixture",
+         "t1": "Melbourne Stars Women [MS-W]", "t2": "Sydney Sixers Women [SS-W]", "series": "Womens Big Bash League 2026"},
+        {"id": "sixes-1", "dateTimeGMT": "2026-09-12T08:00:00", "matchType": "t20", "ms": "result",
+         "status": "Pakistan won by 2 runs", "t1": "Pakistan [PAK]", "t2": "India [IND]", "series": "Hong Kong Sixes 2026"},
     ],
 }
 
@@ -65,11 +69,27 @@ def test_competition_for(series, teams, expected):
     assert fixtures.competition_for(series, *teams) == expected
 
 
+@pytest.mark.parametrize("series, teams, expected", [
+    ("Nepal Premier League 2026", ("Kathmandu Gorkhas", "Lumbini Lions"), True),
+    ("Womens Big Bash League 2026", ("Melbourne Stars Women", "Sydney Sixers Women"), False),
+    ("ICC Women's T20 World Cup", ("India", "England"), False),
+    ("Hong Kong Sixes 2026", ("Pakistan", "India"), False),
+    ("Abu Dhabi T10 2026", ("Team Abu Dhabi", "Deccan Gladiators"), False),
+    ("Tri-series", ("India Women", "Australia Women"), False),
+])
+def test_in_scope_keeps_only_mens_20_over_matches(series, teams, expected):
+    assert fixtures.in_scope(series, *teams) is expected
+
+
 def test_build_fixtures_filters_orders_and_predicts():
     oracle = StubOracle(p=0.25)
-    matches = fixtures.build_fixtures(SAMPLE, StubPrematch(), oracle)
+    known = {"chennai-super-kings": "https://cdn/csk.png"}
+    matches = fixtures.build_fixtures(SAMPLE, StubPrematch(), oracle, known_logos=known, local_logos={})
 
     assert [m["id"] for m in matches] == ["live-1", "fixture-1", "result-1"]
+    assert matches[0]["logo1"] == "https://g.cricapi.com/iapi/226.png?w=128"  # from the feed, enlarged
+    assert matches[0]["logo2"] == "https://cdn/csk.png"  # from the cache
+    assert matches[1]["logo1"] is None
     live = matches[0]
     assert oracle.calls == [(2, 150, 96, 6, 190)]  # CSK's innings is complete, so Mumbai are chasing 190
     assert live["live"]["batting"] == "Mumbai Indians"

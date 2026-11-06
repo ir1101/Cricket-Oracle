@@ -1,7 +1,29 @@
 {
  "k": 16,
  "season_carry": 1.0,
- "scale": 0.48271209667701087,
+ "margin_k": 0.08,
+ "margin_season_carry": 0.6,
+ "weights": {
+  "elo": 0.21802838845634506,
+  "margin": 0.4697337413308235
+ },
+ "slopes": {
+  "bbl": 0.587,
+  "blast": 0.605,
+  "bpl": 0.696,
+  "cpl": 0.418,
+  "csa_t20": 0.151,
+  "ilt20": 0.175,
+  "ipl": 0.0,
+  "lpl": 0.005,
+  "mlc": 0.206,
+  "msl": 1.0,
+  "psl": 0.358,
+  "sa20": 0.0,
+  "smat": 0.79,
+  "super_smash": 0.0,
+  "t20i": 0.773
+ },
  "as_of": "2026-09-08",
  "ratings": [
   {
@@ -9,1456 +31,1664 @@
    "team": "Australia",
    "rating": 1590.4,
    "matches": 200,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.098
   },
   {
    "competition": "t20i",
    "team": "New Zealand",
    "rating": 1535.6,
    "matches": 212,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.019
   },
   {
    "competition": "t20i",
    "team": "England",
    "rating": 1639.4,
    "matches": 195,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 1.507
   },
   {
    "competition": "t20i",
    "team": "South Africa",
    "rating": 1558.2,
    "matches": 203,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.385
   },
   {
    "competition": "t20i",
    "team": "Sri Lanka",
    "rating": 1413.6,
    "matches": 193,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.31
   },
   {
    "competition": "t20i",
    "team": "Pakistan",
    "rating": 1533.7,
    "matches": 249,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.539
   },
   {
    "competition": "t20i",
    "team": "India",
    "rating": 1664.0,
    "matches": 244,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.505
   },
   {
    "competition": "t20i",
    "team": "West Indies",
    "rating": 1458.0,
    "matches": 204,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.116
   },
   {
    "competition": "t20i",
    "team": "Bangladesh",
    "rating": 1412.4,
    "matches": 159,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.737
   },
   {
    "competition": "t20i",
    "team": "Zimbabwe",
    "rating": 1323.7,
    "matches": 117,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -1.552
   },
   {
    "competition": "ipl",
    "team": "Kolkata Knight Riders",
    "rating": 1523.4,
    "matches": 262,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.028
   },
   {
    "competition": "ipl",
    "team": "Royal Challengers Bengaluru",
    "rating": 1602.9,
    "matches": 276,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.978
   },
   {
    "competition": "ipl",
    "team": "Chennai Super Kings",
    "rating": 1486.7,
    "matches": 259,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.471
   },
   {
    "competition": "ipl",
    "team": "Punjab Kings",
    "rating": 1510.1,
    "matches": 264,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.039
   },
   {
    "competition": "ipl",
    "team": "Rajasthan Royals",
    "rating": 1512.3,
    "matches": 243,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.088
   },
   {
    "competition": "ipl",
    "team": "Delhi Capitals",
    "rating": 1517.6,
    "matches": 266,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.404
   },
   {
    "competition": "ipl",
    "team": "Mumbai Indians",
    "rating": 1483.9,
    "matches": 286,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.24
   },
   {
    "competition": "ipl",
    "team": "Deccan Chargers",
    "rating": 1439.8,
    "matches": 75,
-   "last_season": 2012
+   "last_season": 2012,
+   "margin": -0.257
   },
   {
    "competition": "t20i",
    "team": "Ireland",
    "rating": 1370.9,
    "matches": 62,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.305
   },
   {
    "competition": "ipl",
    "team": "Kochi Tuskers Kerala",
    "rating": 1479.9,
    "matches": 13,
-   "last_season": 2011
+   "last_season": 2011,
+   "margin": 0.171
   },
   {
    "competition": "ipl",
    "team": "Pune Warriors",
    "rating": 1394.0,
    "matches": 45,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": -0.618
   },
   {
    "competition": "bbl",
    "team": "Brisbane Heat",
    "rating": 1486.7,
    "matches": 151,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.123
   },
   {
    "competition": "bbl",
    "team": "Sydney Sixers",
    "rating": 1588.8,
    "matches": 157,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.311
   },
   {
    "competition": "bbl",
    "team": "Melbourne Stars",
    "rating": 1475.3,
    "matches": 154,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.311
   },
   {
    "competition": "bbl",
    "team": "Sydney Thunder",
    "rating": 1440.5,
    "matches": 138,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.681
   },
   {
    "competition": "bbl",
    "team": "Adelaide Strikers",
    "rating": 1458.4,
    "matches": 160,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.07
   },
   {
    "competition": "bbl",
    "team": "Melbourne Renegades",
    "rating": 1409.1,
    "matches": 153,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.668
   },
   {
    "competition": "bbl",
    "team": "Hobart Hurricanes",
    "rating": 1538.8,
    "matches": 153,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.002
   },
   {
    "competition": "bbl",
    "team": "Perth Scorchers",
    "rating": 1602.4,
    "matches": 164,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.921
   },
   {
    "competition": "bpl",
    "team": "Barisal Burners",
    "rating": 1482.7,
    "matches": 19,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": 0.036
   },
   {
    "competition": "bpl",
    "team": "Duronto Rajshahi",
    "rating": 1492.8,
    "matches": 18,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": -0.368
   },
   {
    "competition": "bpl",
    "team": "Khulna Royal Bengals",
    "rating": 1459.4,
    "matches": 16,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": -0.69
   },
   {
    "competition": "bpl",
    "team": "Chittagong Kings",
    "rating": 1535.2,
    "matches": 30,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": 0.926
   },
   {
    "competition": "bpl",
    "team": "Sylhet Royals",
    "rating": 1535.0,
    "matches": 15,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": 0.411
   },
   {
    "competition": "bpl",
    "team": "Dhaka Gladiators",
    "rating": 1538.7,
    "matches": 17,
-   "last_season": 2013
+   "last_season": 2013,
+   "margin": 0.586
   },
   {
    "competition": "csa_t20",
    "team": "Cape Cobras",
    "rating": 1517.9,
    "matches": 69,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -0.148
   },
   {
    "competition": "csa_t20",
    "team": "Warriors",
    "rating": 1490.6,
    "matches": 78,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.061
   },
   {
    "competition": "csa_t20",
    "team": "Lions",
    "rating": 1554.7,
    "matches": 80,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.305
   },
   {
    "competition": "csa_t20",
    "team": "Impi",
    "rating": 1454.5,
    "matches": 6,
-   "last_season": 2012
+   "last_season": 2012,
+   "margin": -0.765
   },
   {
    "competition": "csa_t20",
    "team": "Dolphins",
    "rating": 1499.3,
    "matches": 82,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.056
   },
   {
    "competition": "csa_t20",
    "team": "Titans",
    "rating": 1615.1,
    "matches": 90,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.702
   },
   {
    "competition": "csa_t20",
    "team": "Knights",
    "rating": 1414.8,
    "matches": 76,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.238
   },
   {
    "competition": "super_smash",
    "team": "Wellington",
    "rating": 1465.5,
    "matches": 84,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.016
   },
   {
    "competition": "super_smash",
    "team": "Otago",
    "rating": 1427.8,
    "matches": 77,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.366
   },
   {
    "competition": "bpl",
    "team": "Rangpur Riders",
    "rating": 1572.5,
    "matches": 110,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.076
   },
   {
    "competition": "ipl",
    "team": "Sunrisers Hyderabad",
    "rating": 1524.5,
    "matches": 201,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.226
   },
   {
    "competition": "cpl",
    "team": "Barbados Tridents",
    "rating": 1467.4,
    "matches": 78,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.372
   },
   {
    "competition": "cpl",
    "team": "St Lucia Zouks",
    "rating": 1482.6,
    "matches": 48,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": 0.561
   },
   {
    "competition": "cpl",
    "team": "Guyana Amazon Warriors",
    "rating": 1616.5,
    "matches": 143,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.614
   },
   {
    "competition": "cpl",
    "team": "Trinidad & Tobago Red Steel",
    "rating": 1528.8,
    "matches": 27,
-   "last_season": 2015
+   "last_season": 2015,
+   "margin": 0.245
   },
   {
    "competition": "cpl",
    "team": "Antigua Hawksbills",
    "rating": 1466.3,
    "matches": 11,
-   "last_season": 2014
+   "last_season": 2014,
+   "margin": -0.221
   },
   {
    "competition": "cpl",
    "team": "Jamaica Tallawahs",
    "rating": 1495.7,
    "matches": 109,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.49
   },
   {
    "competition": "super_smash",
    "team": "Auckland",
    "rating": 1498.5,
    "matches": 76,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.115
   },
   {
    "competition": "super_smash",
    "team": "Northern Districts",
    "rating": 1547.5,
    "matches": 78,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.809
   },
   {
    "competition": "super_smash",
    "team": "Canterbury",
    "rating": 1527.4,
    "matches": 87,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.11
   },
   {
    "competition": "blast",
    "team": "Nottinghamshire",
    "rating": 1525.1,
    "matches": 162,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.007
   },
   {
    "competition": "blast",
    "team": "Lancashire",
    "rating": 1548.8,
    "matches": 163,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.032
   },
   {
    "competition": "blast",
    "team": "Yorkshire",
    "rating": 1490.5,
    "matches": 153,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.355
   },
   {
    "competition": "blast",
    "team": "Northamptonshire",
    "rating": 1571.8,
    "matches": 155,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.663
   },
   {
    "competition": "blast",
    "team": "Leicestershire",
    "rating": 1407.1,
    "matches": 153,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -1.182
   },
   {
    "competition": "blast",
    "team": "Derbyshire",
    "rating": 1421.5,
    "matches": 156,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.003
   },
   {
    "competition": "blast",
    "team": "Durham",
    "rating": 1460.1,
    "matches": 159,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.256
   },
   {
    "competition": "blast",
    "team": "Worcestershire",
    "rating": 1476.3,
    "matches": 165,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.01
   },
   {
    "competition": "blast",
    "team": "Glamorgan",
    "rating": 1472.2,
    "matches": 151,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.279
   },
   {
    "competition": "blast",
    "team": "Hampshire",
    "rating": 1552.8,
    "matches": 169,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.416
   },
   {
    "competition": "blast",
    "team": "Middlesex",
    "rating": 1370.3,
    "matches": 157,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.936
   },
   {
    "competition": "blast",
    "team": "Essex",
    "rating": 1468.1,
    "matches": 159,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.165
   },
   {
    "competition": "blast",
    "team": "Sussex",
    "rating": 1458.1,
    "matches": 156,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.868
   },
   {
    "competition": "blast",
    "team": "Surrey",
    "rating": 1591.0,
    "matches": 165,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.543
   },
   {
    "competition": "blast",
    "team": "Somerset",
    "rating": 1629.2,
    "matches": 168,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.859
   },
   {
    "competition": "blast",
    "team": "Kent",
    "rating": 1452.6,
    "matches": 159,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.964
   },
   {
    "competition": "blast",
    "team": "Gloucestershire",
    "rating": 1511.4,
    "matches": 155,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.126
   },
   {
    "competition": "blast",
    "team": "Warwickshire",
    "rating": 1558.0,
    "matches": 64,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.575
   },
   {
    "competition": "cpl",
    "team": "St Kitts and Nevis Patriots",
    "rating": 1422.9,
    "matches": 108,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.279
   },
   {
    "competition": "bpl",
    "team": "Comilla Victorians",
    "rating": 1625.1,
    "matches": 88,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.934
   },
   {
    "competition": "bpl",
    "team": "Dhaka Dynamites",
    "rating": 1535.1,
    "matches": 53,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.65
   },
   {
    "competition": "bpl",
    "team": "Barisal Bulls",
    "rating": 1489.4,
    "matches": 24,
-   "last_season": 2016
+   "last_season": 2016,
+   "margin": -0.407
   },
   {
    "competition": "bpl",
    "team": "Chittagong Vikings",
    "rating": 1459.5,
    "matches": 42,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": -0.29
   },
   {
    "competition": "bpl",
    "team": "Sylhet Super Stars",
    "rating": 1479.6,
    "matches": 9,
-   "last_season": 2015
+   "last_season": 2015,
+   "margin": -0.473
   },
   {
    "competition": "smat",
    "team": "Gujarat",
    "rating": 1544.5,
    "matches": 43,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.55
   },
   {
    "competition": "smat",
    "team": "Himachal",
    "rating": 1522.8,
    "matches": 28,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": 0.528
   },
   {
    "competition": "smat",
    "team": "Bengal",
    "rating": 1551.1,
    "matches": 43,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.112
   },
   {
    "competition": "smat",
    "team": "Hyderabad (India)",
    "rating": 1486.2,
    "matches": 34,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.242
   },
   {
    "competition": "smat",
    "team": "Haryana",
    "rating": 1560.1,
    "matches": 38,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.376
   },
   {
    "competition": "smat",
    "team": "Tamil Nadu",
    "rating": 1633.8,
    "matches": 48,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.242
   },
   {
    "competition": "smat",
    "team": "Punjab",
    "rating": 1600.6,
    "matches": 51,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 1.559
   },
   {
    "competition": "smat",
    "team": "Rajasthan",
    "rating": 1567.3,
    "matches": 35,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": 0.311
   },
   {
    "competition": "smat",
    "team": "Jammu & Kashmir",
    "rating": 1474.7,
    "matches": 31,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.059
   },
   {
    "competition": "smat",
    "team": "Kerala",
    "rating": 1518.1,
    "matches": 38,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.036
   },
   {
    "competition": "smat",
    "team": "Saurashtra",
    "rating": 1557.2,
    "matches": 40,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.477
   },
   {
    "competition": "smat",
    "team": "Tripura",
    "rating": 1442.6,
    "matches": 36,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.228
   },
   {
    "competition": "smat",
    "team": "Andhra",
    "rating": 1482.9,
    "matches": 36,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.193
   },
   {
    "competition": "smat",
    "team": "Madhya Pradesh",
    "rating": 1532.8,
    "matches": 41,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.303
   },
   {
    "competition": "smat",
    "team": "Railways",
    "rating": 1463.4,
    "matches": 42,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.283
   },
   {
    "competition": "smat",
    "team": "Delhi",
    "rating": 1588.5,
    "matches": 51,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.444
   },
   {
    "competition": "smat",
    "team": "Odisha",
    "rating": 1446.1,
    "matches": 27,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -0.527
   },
   {
    "competition": "smat",
    "team": "Mumbai",
    "rating": 1621.1,
    "matches": 55,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.721
   },
   {
    "competition": "smat",
    "team": "Karnataka",
    "rating": 1621.9,
    "matches": 52,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.149
   },
   {
    "competition": "smat",
    "team": "Services",
    "rating": 1490.8,
    "matches": 30,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -0.281
   },
   {
    "competition": "smat",
    "team": "Maharashtra",
    "rating": 1545.1,
    "matches": 39,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": 0.849
   },
   {
    "competition": "smat",
    "team": "Uttar Pradesh",
    "rating": 1550.3,
    "matches": 45,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.434
   },
   {
    "competition": "smat",
    "team": "Vidarbha",
    "rating": 1555.9,
    "matches": 44,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.288
   },
   {
    "competition": "smat",
    "team": "Jharkhand",
    "rating": 1521.1,
    "matches": 36,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": 0.36
   },
   {
    "competition": "smat",
    "team": "Goa",
    "rating": 1424.7,
    "matches": 37,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.373
   },
   {
    "competition": "smat",
    "team": "Baroda",
    "rating": 1565.6,
    "matches": 54,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.286
   },
   {
    "competition": "smat",
    "team": "Assam",
    "rating": 1470.9,
    "matches": 37,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.005
   },
   {
    "competition": "psl",
    "team": "Islamabad United",
    "rating": 1526.6,
    "matches": 119,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.583
   },
   {
    "competition": "psl",
    "team": "Quetta Gladiators",
    "rating": 1476.3,
    "matches": 112,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.155
   },
   {
    "competition": "psl",
    "team": "Lahore Qalandars",
    "rating": 1520.7,
    "matches": 112,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.017
   },
   {
    "competition": "psl",
    "team": "Karachi Kings",
    "rating": 1457.0,
    "matches": 109,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.302
   },
   {
    "competition": "psl",
    "team": "Peshawar Zalmi",
    "rating": 1561.9,
    "matches": 120,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 1.424
   },
   {
    "competition": "ipl",
    "team": "Rising Pune Supergiant",
    "rating": 1515.1,
    "matches": 27,
-   "last_season": 2017
+   "last_season": 2017,
+   "margin": 0.425
   },
   {
    "competition": "ipl",
    "team": "Gujarat Lions",
    "rating": 1475.8,
    "matches": 29,
-   "last_season": 2017
+   "last_season": 2017,
+   "margin": -0.346
   },
   {
    "competition": "cpl",
    "team": "Trinbago Knight Riders",
    "rating": 1585.7,
    "matches": 115,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.118
   },
   {
    "competition": "bpl",
    "team": "Khulna Titans",
    "rating": 1464.3,
    "matches": 36,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": -0.799
   },
   {
    "competition": "bpl",
    "team": "Rajshahi Kings",
    "rating": 1479.5,
    "matches": 38,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": -0.336
   },
   {
    "competition": "cpl",
    "team": "St Lucia Stars",
    "rating": 1437.1,
    "matches": 17,
-   "last_season": 2018
+   "last_season": 2018,
+   "margin": -0.641
   },
   {
    "competition": "bpl",
    "team": "Sylhet Sixers",
    "rating": 1469.9,
    "matches": 23,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.124
   },
   {
    "competition": "super_smash",
    "team": "Central Districts",
    "rating": 1533.2,
    "matches": 80,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.233
   },
   {
    "competition": "smat",
    "team": "Chhattisgarh",
    "rating": 1462.6,
    "matches": 30,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.093
   },
   {
    "competition": "psl",
    "team": "Multan Sultans",
    "rating": 1500.9,
    "matches": 97,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.393
   },
   {
    "competition": "blast",
    "team": "Birmingham Bears",
    "rating": 1535.0,
    "matches": 103,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.121
   },
   {
    "competition": "msl",
    "team": "Cape Town Blitz",
    "rating": 1495.3,
    "matches": 18,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.152
   },
   {
    "competition": "msl",
    "team": "Tshwane Spartans",
    "rating": 1506.5,
    "matches": 15,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": -0.129
   },
   {
    "competition": "msl",
    "team": "Jozi Stars",
    "rating": 1468.7,
    "matches": 18,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": -0.61
   },
   {
    "competition": "msl",
    "team": "Nelson Mandela Bay Giants",
    "rating": 1510.6,
    "matches": 16,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.101
   },
   {
    "competition": "msl",
    "team": "Durban Heat",
    "rating": 1492.5,
    "matches": 12,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.089
   },
   {
    "competition": "msl",
    "team": "Paarl Rocks",
    "rating": 1526.5,
    "matches": 19,
-   "last_season": 2019
+   "last_season": 2019,
+   "margin": 0.396
   },
   {
    "competition": "smat",
    "team": "Manipur",
    "rating": 1380.1,
    "matches": 26,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -1.866
   },
   {
    "competition": "smat",
    "team": "Nagaland",
    "rating": 1411.4,
    "matches": 25,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.823
   },
   {
    "competition": "smat",
    "team": "Meghalaya",
    "rating": 1464.1,
    "matches": 25,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.696
   },
   {
    "competition": "smat",
    "team": "Sikkim",
    "rating": 1384.1,
    "matches": 21,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -2.166
   },
   {
    "competition": "smat",
    "team": "Arunachal Pradesh",
    "rating": 1354.7,
    "matches": 23,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -2.45
   },
   {
    "competition": "smat",
    "team": "Mizoram",
    "rating": 1329.0,
    "matches": 29,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -1.452
   },
   {
    "competition": "smat",
    "team": "Puducherry",
    "rating": 1442.4,
    "matches": 25,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": -0.687
   },
   {
    "competition": "smat",
    "team": "Uttarakhand",
    "rating": 1476.3,
    "matches": 24,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": 0.26
   },
   {
    "competition": "smat",
    "team": "Bihar",
    "rating": 1447.4,
    "matches": 24,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": -0.778
   },
   {
    "competition": "smat",
    "team": "Chandigarh",
    "rating": 1480.4,
    "matches": 14,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.262
   },
   {
    "competition": "bpl",
    "team": "Sylhet Thunder",
    "rating": 1435.7,
    "matches": 11,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": -0.479
   },
   {
    "competition": "bpl",
    "team": "Chattogram Challengers",
    "rating": 1507.5,
    "matches": 50,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.295
   },
   {
    "competition": "bpl",
    "team": "Cumilla Warriors",
    "rating": 1478.1,
    "matches": 11,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": -0.479
   },
   {
    "competition": "bpl",
    "team": "Rangpur Rangers",
    "rating": 1490.2,
    "matches": 12,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": -0.251
   },
   {
    "competition": "bpl",
    "team": "Dhaka Platoon",
    "rating": 1506.5,
    "matches": 13,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": 0.184
   },
   {
    "competition": "bpl",
    "team": "Rajshahi Royals",
    "rating": 1535.5,
    "matches": 15,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": 0.307
   },
   {
    "competition": "bpl",
    "team": "Khulna Tigers",
    "rating": 1495.0,
    "matches": 63,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": 0.503
   },
   {
    "competition": "lpl",
    "team": "Galle Gladiators",
    "rating": 1451.5,
    "matches": 28,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": -0.53
   },
   {
    "competition": "lpl",
    "team": "Jaffna Stallions",
    "rating": 1520.3,
    "matches": 9,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": 0.563
   },
   {
    "competition": "lpl",
    "team": "Colombo Kings",
    "rating": 1513.8,
    "matches": 8,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": 0.329
   },
   {
    "competition": "lpl",
    "team": "Dambulla Viiking",
    "rating": 1506.2,
    "matches": 7,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": -0.21
   },
   {
    "competition": "lpl",
    "team": "Kandy Tuskers",
    "rating": 1484.4,
    "matches": 6,
-   "last_season": 2020
+   "last_season": 2020,
+   "margin": -0.341
   },
   {
    "competition": "cpl",
    "team": "Barbados Royals",
    "rating": 1459.9,
    "matches": 45,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": -0.347
   },
   {
    "competition": "cpl",
    "team": "St Lucia Kings",
    "rating": 1514.1,
    "matches": 58,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.511
   },
   {
    "competition": "lpl",
    "team": "Jaffna Kings",
    "rating": 1553.0,
    "matches": 47,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.153
   },
   {
    "competition": "lpl",
    "team": "Dambulla Giants",
    "rating": 1490.4,
    "matches": 9,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -0.436
   },
   {
    "competition": "lpl",
    "team": "Kandy Warriors",
    "rating": 1484.0,
    "matches": 6,
-   "last_season": 2021
+   "last_season": 2021,
+   "margin": -0.347
   },
   {
    "competition": "lpl",
    "team": "Colombo Stars",
    "rating": 1489.0,
    "matches": 20,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": -0.112
   },
   {
    "competition": "bpl",
    "team": "Fortune Barishal",
    "rating": 1620.3,
    "matches": 53,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": 1.329
   },
   {
    "competition": "bpl",
    "team": "Minister Group Dhaka",
    "rating": 1497.9,
    "matches": 9,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": 0.107
   },
   {
    "competition": "bpl",
    "team": "Sylhet Sunrisers",
    "rating": 1452.7,
    "matches": 9,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": -0.357
   },
   {
    "competition": "csa_t20",
    "team": "Boland",
    "rating": 1480.6,
    "matches": 17,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.356
   },
   {
    "competition": "csa_t20",
    "team": "Western Province",
    "rating": 1491.5,
    "matches": 21,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.063
   },
   {
    "competition": "csa_t20",
    "team": "North West",
    "rating": 1489.3,
    "matches": 18,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.146
   },
   {
    "competition": "ipl",
    "team": "Lucknow Super Giants",
    "rating": 1468.8,
    "matches": 69,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.625
   },
   {
    "competition": "ipl",
    "team": "Gujarat Titans",
    "rating": 1565.2,
    "matches": 75,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.438
   },
   {
    "competition": "smat",
    "team": "Himachal Pradesh",
    "rating": 1527.0,
    "matches": 5,
-   "last_season": 2022
+   "last_season": 2022,
+   "margin": 0.685
   },
   {
    "competition": "lpl",
    "team": "Kandy Falcons",
    "rating": 1514.7,
    "matches": 19,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.164
   },
   {
    "competition": "lpl",
    "team": "Dambulla Aura",
    "rating": 1515.8,
    "matches": 17,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.308
   },
   {
    "competition": "bpl",
    "team": "Sylhet Strikers",
    "rating": 1475.4,
    "matches": 38,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": -1.078
   },
   {
    "competition": "bpl",
    "team": "Dhaka Dominators",
    "rating": 1467.0,
    "matches": 12,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": -0.294
   },
   {
    "competition": "sa20",
    "team": "Paarl Royals",
    "rating": 1502.8,
    "matches": 44,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.528
   },
   {
    "competition": "sa20",
    "team": "MI Cape Town",
    "rating": 1495.5,
    "matches": 36,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.149
   },
   {
    "competition": "sa20",
    "team": "Joburg Super Kings",
    "rating": 1475.9,
    "matches": 34,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.416
   },
   {
    "competition": "sa20",
    "team": "Durban's Super Giants",
    "rating": 1477.2,
    "matches": 34,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.028
   },
   {
    "competition": "sa20",
    "team": "Pretoria Capitals",
    "rating": 1490.1,
    "matches": 40,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.109
   },
   {
    "competition": "sa20",
    "team": "Sunrisers Eastern Cape",
    "rating": 1558.4,
    "matches": 46,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.714
   },
   {
    "competition": "ilt20",
    "team": "Dubai Capitals",
    "rating": 1517.7,
    "matches": 46,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.029
   },
   {
    "competition": "ilt20",
    "team": "Abu Dhabi Knight Riders",
    "rating": 1442.9,
    "matches": 42,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.051
   },
   {
    "competition": "ilt20",
    "team": "MI Emirates",
    "rating": 1536.9,
    "matches": 47,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.243
   },
   {
    "competition": "ilt20",
    "team": "Sharjah Warriors",
    "rating": 1468.3,
    "matches": 19,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -1.007
   },
   {
    "competition": "ilt20",
    "team": "Gulf Giants",
    "rating": 1487.8,
    "matches": 42,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": -0.225
   },
   {
    "competition": "ilt20",
    "team": "Desert Vipers",
    "rating": 1569.7,
    "matches": 46,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.503
   },
   {
    "competition": "mlc",
    "team": "Texas Super Kings",
    "rating": 1484.2,
    "matches": 35,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.077
   },
   {
    "competition": "mlc",
    "team": "Los Angeles Knight Riders",
    "rating": 1475.1,
    "matches": 32,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.02
   },
   {
    "competition": "mlc",
    "team": "San Francisco Unicorns",
    "rating": 1523.5,
    "matches": 35,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.307
   },
   {
    "competition": "mlc",
    "team": "MI New York",
    "rating": 1493.7,
    "matches": 38,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.204
   },
   {
    "competition": "mlc",
    "team": "Washington Freedom",
    "rating": 1570.7,
    "matches": 36,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.002
   },
   {
    "competition": "mlc",
    "team": "Seattle Orcas",
    "rating": 1452.8,
    "matches": 34,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.203
   },
   {
    "competition": "lpl",
    "team": "Colombo Strikers",
    "rating": 1483.6,
    "matches": 17,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": 0.074
   },
   {
    "competition": "lpl",
    "team": "B-Love Kandy",
    "rating": 1525.5,
    "matches": 11,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.56
   },
   {
    "competition": "lpl",
    "team": "Galle Titans",
    "rating": 1479.6,
    "matches": 9,
-   "last_season": 2023
+   "last_season": 2023,
+   "margin": 0.115
   },
   {
    "competition": "bpl",
    "team": "Durdanto Dhaka",
    "rating": 1436.1,
    "matches": 12,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.82
   },
   {
    "competition": "csa_t20",
    "team": "KwaZulu-Natal Inland",
    "rating": 1491.6,
    "matches": 1,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.147
   },
   {
    "competition": "lpl",
    "team": "Dambulla Sixers",
    "rating": 1473.8,
    "matches": 14,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.26
   },
   {
    "competition": "lpl",
    "team": "Galle Marvels",
    "rating": 1508.4,
    "matches": 9,
-   "last_season": 2024
+   "last_season": 2024,
+   "margin": -0.176
   },
   {
    "competition": "cpl",
    "team": "Antigua and Barbuda Falcons",
    "rating": 1534.0,
    "matches": 27,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.005
   },
   {
    "competition": "bpl",
    "team": "Durbar Rajshahi",
    "rating": 1509.6,
    "matches": 12,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": -0.393
   },
   {
    "competition": "bpl",
    "team": "Dhaka Capitals",
    "rating": 1448.0,
    "matches": 22,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.36
   },
   {
    "competition": "ilt20",
    "team": "Sharjah Warriorz",
    "rating": 1476.7,
    "matches": 22,
-   "last_season": 2025
+   "last_season": 2025,
+   "margin": -0.28
   },
   {
    "competition": "bpl",
    "team": "Sylhet Titans",
    "rating": 1504.9,
    "matches": 12,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.139
   },
   {
    "competition": "bpl",
    "team": "Rajshahi Warriors",
    "rating": 1544.8,
    "matches": 12,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.459
   },
   {
    "competition": "bpl",
    "team": "Chattogram Royals",
    "rating": 1515.8,
    "matches": 12,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.11
   },
   {
    "competition": "bpl",
    "team": "Noakhali Express",
    "rating": 1460.3,
    "matches": 10,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.441
   },
   {
    "competition": "psl",
    "team": "Hyderabad Kingsmen",
    "rating": 1512.4,
    "matches": 13,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.06
   },
   {
    "competition": "psl",
    "team": "Rawalpindiz",
    "rating": 1444.2,
    "matches": 10,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -1.114
   },
   {
    "competition": "lpl",
    "team": "Galle Gallants",
    "rating": 1525.0,
    "matches": 11,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.338
   },
   {
    "competition": "lpl",
    "team": "Kandy Royals",
    "rating": 1480.1,
    "matches": 9,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.528
   },
   {
    "competition": "lpl",
    "team": "Colombo Kaps",
    "rating": 1500.8,
    "matches": 10,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": 0.222
   },
   {
    "competition": "cpl",
    "team": "Jamaica Kingsmen",
    "rating": 1489.0,
    "matches": 8,
-   "last_season": 2026
+   "last_season": 2026,
+   "margin": -0.014
   }
  ]
 }

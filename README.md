@@ -9,7 +9,8 @@ The site has three sections:
 - **History** (`/history`) replays any IPL match with ball-by-ball win probability and a
   chase-difficulty heatmap.
 - **Upcoming** (`/upcoming`) lists men's T20 fixtures for the next seven days from CricketData.org.
-  Pre-match odds come from Elo team ratings; in-play odds take over once a match is live.
+  Pre-match odds come from team ratings, recalibrated per competition; in-play odds take over once a
+  match is live.
 - **Calculator** (`/calculator`) gives the odds for any situation you type in, plus the chase map for
   that target.
 
@@ -23,9 +24,10 @@ pip install -r requirements.txt
 python -m oracle.ingest            # download 15 Cricsheet T20 archives (~40 MB) -> data/processed/*.parquet
 python -m oracle.train --compare-data   # optional: re-check how much weight non-IPL matches get
 python -m oracle.train             # features, both innings models, reports/metrics.json
-python -m oracle.prematch          # Elo team ratings for upcoming fixtures, reports/prematch.json
+python -m oracle.prematch          # team ratings for upcoming fixtures, reports/prematch.json
+python -m oracle.logos             # optional: IPL team logos (CricketData.org, 3 API calls) and defunct teams' (Wikipedia)
 uvicorn api.main:app               # then open http://localhost:8000
-python -m pytest                   # 67 tests
+python -m pytest                   # 108 tests
 ```
 
 For live fixtures, get a free key from [CricketData.org](https://cricketdata.org) and put it in a
@@ -38,8 +40,28 @@ CRICKETDATA_API_KEY=your-key-here
 Without a key, the Upcoming page explains how to add one. The free tier allows 100 calls a day, so
 the server caches the fixture feed for 30 minutes in `data/cache/`.
 
-Photos go in `web/images/`. A file name starting with `hero`, `spotlight`, `history`, `upcoming`,
-`calculator` or `gallery` goes to that slot; other images fill the remaining slots in page order.
+Photos go in `web/images/` and are shown in black and white. Each slot takes the first file whose
+name starts with one of its prefixes:
+
+| Slot | File name prefixes, in order of preference |
+|---|---|
+| Home page hero | `hero-loop` (an MP4 or WebM loop, skipped for reduced motion), then `hero-action`, then `hero` |
+| "How sure is it?" band | `stadium`, then `spotlight` |
+| Hover photos on the home page's tool links | `history`, `upcoming`, `calculator` |
+
+Optional focal points go in `web/images/photos.json`, for example `{"hero-1.jpg": {"focus": "50% 0%"}}`.
+
+Team logos appear before team names. They are the teams' trademarks, so they are linked from where
+they're hosted, not copied into the project:
+- **Current IPL teams:** `python -m oracle.logos` looks them up on CricketData.org, which serves them with its data.
+- **Defunct IPL teams:** the same command looks up Deccan Chargers, Kochi Tuskers Kerala, Pune Warriors,
+  Gujarat Lions and Rising Pune Supergiant on Wikipedia, since CricketData.org's history starts in 2022.
+  Wikipedia hosts these logos under fair use for its own articles. That's fine for a personal or local
+  site, but publishing commercially would need permission from the rights holders.
+- **Other teams:** picked up from the fixtures feed as fixtures load.
+- **Your own files:** a file in `web/images/logos/` named after the team (for example
+  `chennai-super-kings.svg`) takes priority.
+- **No logo:** the team shows a monogram in its colours.
 
 ## How it works
 
@@ -51,9 +73,9 @@ Photos go in `web/images/`. A file name starting with `hero`, `spotlight`, `hist
 | Models | `oracle/models.py` | Logistic regression plus LightGBM with monotone constraints (more runs required never helps the chase; more balls or wickets never hurts). Recent seasons carry more training weight. The blend weight and Platt calibration are tuned on the validation seasons. The served chase model is retrained on every season through the latest, then its blend and calibration are re-learned from leave-one-season-out predictions for the two latest seasons. The served first-innings model is trained on earlier seasons and calibrated on the two latest, without a refit, because that scored better walk-forward. (Refitting while keeping the old calibrator counts recent trends twice.) |
 | Split | `oracle/config.py` | By season, never at random. Train 2008–2023, validate 2024–2025, test 2026. |
 | Confidence | `oracle/train.py` | Each of the latest three seasons is predicted by a model trained only on earlier seasons. The app shows how often the favourite won at that stage of a match and at that distance from 50-50. |
-| Pre-match | `oracle/prematch.py` | Elo ratings per team within each competition (K = 16), turned into a probability by a logistic fit on the rating gap. |
-| Fixtures | `oracle/fixtures.py` | Reads the CricketData.org `cricScore` feed, keeps men's T20s, attaches pre-match odds, and reads live score strings into in-play odds. |
-| Serve | `api/main.py` | FastAPI serves the API and the site in `web/`: a landing page plus the History, Upcoming and Calculator pages, sharing `web/css/base.css` and `web/js/core.js`. |
+| Pre-match | `oracle/prematch.py` | Two ratings per team within each competition: Elo on results (K = 16) and a margin rating that tracks its net run rate edge. A logistic fit on the two gaps gives the odds. Each competition then scales them by how well they predicted its last five seasons out of sample. Where they didn't, odds are pulled to 50-50. |
+| Fixtures | `oracle/fixtures.py` | Reads the CricketData.org `cricScore` feed and keeps men's 20-over matches only. Women's matches and shorter formats the feed also tags as T20 (Hong Kong Sixes, T10, The Hundred) are dropped. It attaches pre-match odds and reads live score strings into in-play odds. |
+| Serve | `api/main.py` | FastAPI serves the API and the site in `web/`: a landing page plus the History, Upcoming and Calculator pages, sharing `web/css/base.css`, `web/css/motion.css` and `web/js/core.js`. Each match is drawn in its two teams' colours (`matchColors` in `core.js` swaps a colour when the two sides would clash). |
 
 ## Results on the 2026 test season
 
@@ -110,10 +132,16 @@ Weighting every match equally in training gave a small, consistent gain and is s
 - **Heatmap cells and what-if situations are hypothetical states.** Their recent-form features
   assume the innings has gone at an even pace. Replay probabilities use the real ball-by-ball
   history, so the same score can get a slightly different number in the replay.
-- **Pre-match odds are weak.** On 2026 matches they never saw, Elo ratings score log loss 0.681
-  against 0.693 for a coin toss (AUC 0.60, 462 matches, all competitions). For the IPL the AUC is
-  0.50, no better than a coin toss. Auctions reshuffle squads, so past results say little. The
-  Upcoming page shows these numbers next to the in-play model.
+- **Pre-match odds are weak, and the IPL is a coin toss before the start.** Walk-forward over
+  2021–26 (3,432 matches, each season predicted from earlier ones), the served ratings score log loss
+  0.673 against 0.676 for Elo alone and 0.693 for a coin toss. The gain is small: the 90% interval
+  runs from 0.007 better to 0.001 worse. On 2026 alone they are level with Elo (0.682 v 0.681, AUC
+  0.59). In the IPL, no rating predicted winners out of sample from 2023 on, so IPL odds stay at
+  50-50. Elo alone was worse than a coin toss there over 2021–26 (0.707). Auctions reshuffle squads,
+  so past results say little. Also tested and dropped: player strength from each side's last XI
+  (no gain, even with the actual XI) and the toss (the winner won 50.8%). Home sides won 53% of club
+  matches, but the fixtures feed doesn't give the venue. The Upcoming page shows these numbers next
+  to the in-play model.
 - **Live odds for non-IPL matches use the IPL-trained model**, so treat them as a guide.
 - **The fixture parser is built from CricketData.org's documented fields.** The `cricScore` feed
   itself isn't fully documented, so check the Upcoming page after adding a key.
@@ -129,7 +157,8 @@ Weighting every match equally in training gave a small, consistent gain and is s
 | `GET /api/model` | Test metrics, split, blend weights, venue pars |
 | `GET /api/stats` | Headline numbers for the landing page |
 | `GET /api/upcoming` | `status` (`ok`, `no_key` or `error`), fixtures with `prematch` and `live` odds, and the pre-match test report |
-| `GET /api/images` | Photos found in `web/images/` |
+| `GET /api/images` | Photos and video loops found in `web/images/` |
+| `GET /api/logos` | Team logo links by team slug (`chennai-super-kings`), local files first |
 
 ## Data
 

@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from oracle import config, fixtures
+from oracle import config, fixtures, logos
 from oracle.predict import Oracle
 from oracle.prematch import PrematchModel
 from oracle.replay import match_summary, replay
@@ -20,6 +20,7 @@ from oracle.replay import match_summary, replay
 PAGES = ("history", "upcoming", "calculator")
 IMAGES_DIR = config.WEB_DIR / "images"
 IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".webp", ".avif"}
+VIDEO_TYPES = {".mp4", ".webm"}
 
 store = {}
 
@@ -138,11 +139,18 @@ def upcoming():
     return {**fixtures.upcoming(store["prematch"], store["oracle"]), "prematch_report": store["prematch_report"]}
 
 
+@app.get("/api/logos")
+def team_logos():
+    """Logo links by team slug (see oracle.logos.slug), for the teams the site can show a logo for."""
+    return {"logos": logos.available()}
+
+
 @app.get("/api/images")
 def images():
-    """Photos dropped into web/images, for the page's photo slots."""
-    files = sorted(p for p in IMAGES_DIR.glob("*") if p.suffix.lower() in IMAGE_TYPES) if IMAGES_DIR.exists() else []
-    return {"images": [{"name": p.name, "url": f"/images/{quote(p.name)}"} for p in files]}
+    """Photos and video loops dropped into web/images, for the page's photo slots."""
+    files = sorted(IMAGES_DIR.glob("*")) if IMAGES_DIR.exists() else []
+    listing = lambda types: [{"name": p.name, "url": f"/images/{quote(p.name)}"} for p in files if p.suffix.lower() in types]
+    return {"images": listing(IMAGE_TYPES), "videos": listing(VIDEO_TYPES)}
 
 
 def serve_page(name):

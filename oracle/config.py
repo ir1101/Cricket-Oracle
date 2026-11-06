@@ -42,6 +42,11 @@ T20I_FULL_MEMBERS = {
 CRICKETDATA_URL = "https://api.cricapi.com/v1"
 FIXTURE_CACHE_PATH = ROOT / "data" / "cache" / "cricscore.json"
 FIXTURE_CACHE_MINUTES = 30
+# Team logos: image links CricketData.org serves with its data (cached by team), and local files in
+# web/images/logos/ named after the team, e.g. chennai-super-kings.png, which take priority.
+LOGO_CACHE_PATH = ROOT / "data" / "cache" / "team_logos.json"
+LOGO_DIR = WEB_DIR / "images" / "logos"
+LOGO_SIZE = 128  # pixels requested from CricketData.org's image service
 # Series-name keywords -> competition code, used to look up team ratings for live fixtures.
 SERIES_COMPETITIONS = {
     "indian premier league": "ipl",
@@ -74,6 +79,14 @@ ELO_K = 16
 ELO_SEASON_CARRY = 1.0
 PREMATCH_TEST_START = "2026-01-01"
 PREMATCH_PATH = MODELS_DIR / "prematch.json"
+# Margin ratings and per-competition recalibration. Walk-forward log loss over 2021-26 (3,432 matches,
+# coin flip 0.6931): Elo alone 0.6762 (IPL 0.7068); Elo + margin, recalibrated per competition 0.6733 (IPL
+# 0.6944). Player strength from each side's previous XI added nothing (0.6733). K and carry were picked from
+# four settings on 2021-25; the recalibration window and penalty from six.
+MARGIN_K = 0.08
+MARGIN_SEASON_CARRY = 0.6
+PREMATCH_RECAL_SEASONS = 5
+PREMATCH_RECAL_C = 0.05  # penalty on each competition's slope: thin evidence is pulled toward 50-50
 
 MATCHES_PATH = DATA_PROCESSED / "matches.parquet"
 DELIVERIES_PATH = DATA_PROCESSED / "deliveries.parquet"

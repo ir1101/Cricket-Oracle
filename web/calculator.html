@@ -7,58 +7,56 @@
   <meta name="description" content="Enter any IPL situation and get both sides' win probability, plus the chase map for that target.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&display=swap">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/pages.css">
+  <link rel="stylesheet" href="/css/motion.css">
+  <script>
+    // Page fades (motion.css) are skipped when a navigation interrupts them; handle that quietly.
+    for (const type of ["pageswap", "pagereveal"]) {
+      addEventListener(type, (event) => event.viewTransition?.ready.catch(() => {}));
+    }
+  </script>
   <script type="module" src="/js/calculator.js"></script>
 </head>
 <body data-page="calculator">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <section class="ticker" aria-label="Scores and model notes">
-    <div class="ticker-inner">
-      <span class="ticker-label mono">Latest</span>
-      <div class="ticker-viewport">
-        <div class="ticker-track mono" id="ticker-track"><span class="ticker-item">Loading scores…</span></div>
-      </div>
-    </div>
-  </section>
-
   <header class="site-header">
-    <div class="site-header-inner">
-      <a class="wordmark" href="/" aria-label="Cricket Oracle home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 7h2.4v14H5zM10.8 7h2.4v14h-2.4zM16.6 7H19v14h-2.4zM4 3.5h7.6v2H4zM12.4 3.5H20v2h-7.6z"/></svg>
-        Cricket Oracle
+    <div class="wrap site-header-inner">
+      <a class="logo" href="/" aria-label="Cricket Oracle home">
+        <span class="logo-top">Cricket</span>
+        <span class="logo-bottom">Oracle</span>
       </a>
       <nav class="site-nav" aria-label="Main">
         <a href="/history" data-nav="history">History</a>
-        <a href="/upcoming" class="nav-dark" data-nav="upcoming">Upcoming</a>
-        <a href="/calculator" class="nav-signal" data-nav="calculator">Calculator</a>
+        <a href="/upcoming" data-nav="upcoming">Upcoming</a>
+        <a href="/calculator" data-nav="calculator">Calculator</a>
       </nav>
+      <a class="live-pill" id="live-pill" href="/upcoming" hidden></a>
     </div>
   </header>
 
   <main id="main">
-    <section class="wrap page-head" aria-labelledby="page-title">
-      <div class="page-head-copy">
-        <p class="mono muted"><span class="index">03</span> Calculator</p>
-        <h1 id="page-title">Ask the<br>Oracle</h1>
+    <section class="wrap page-head tool-head" aria-labelledby="page-title">
+      <p class="eyebrow">Calculator</p>
+      <div class="page-head-row">
+        <h1 id="page-title">Ask the <span class="serif">Oracle</span></h1>
         <p class="lede">Describe any IPL situation: score, overs, wickets and target. The model gives both sides' chances and maps the chase from there.</p>
       </div>
-      <figure class="photo-slot cutout-wide" data-slot="calculator" data-eager aria-hidden="true"></figure>
     </section>
 
     <section class="wrap calc" aria-label="What-if calculator">
       <div class="calc-grid">
-        <form class="whatif-form" id="whatif-form" novalidate>
+        <form class="card whatif-form" id="whatif-form" novalidate>
           <div class="presets" role="group" aria-labelledby="presets-label">
             <span class="label" id="presets-label">Start from a situation</span>
-            <div class="preset-list">
-              <button type="button" class="btn preset" data-preset="thriller">Last-over thriller</button>
-              <button type="button" class="btn preset" data-preset="cruise">Cruising chase</button>
-              <button type="button" class="btn preset" data-preset="collapse">Middle-overs collapse</button>
-              <button type="button" class="btn preset" data-preset="blitz">Powerplay blitz</button>
-              <button type="button" class="btn preset" data-preset="par">Par pace</button>
+            <div class="chip-list">
+              <button type="button" class="chip-button" data-preset="thriller">Last-over thriller</button>
+              <button type="button" class="chip-button" data-preset="cruise">Cruising chase</button>
+              <button type="button" class="chip-button" data-preset="collapse">Middle-overs collapse</button>
+              <button type="button" class="chip-button" data-preset="blitz">Powerplay blitz</button>
+              <button type="button" class="chip-button" data-preset="par">Par pace</button>
             </div>
           </div>
 
@@ -100,15 +98,15 @@
           </div>
         </form>
 
-        <div class="whatif-result night" id="whatif-result" data-state="loading" aria-live="polite">
-          <p class="mono"><span class="bracket">The Oracle says</span></p>
+        <div class="card whatif-result" id="whatif-result" data-state="loading" aria-live="polite">
+          <p class="eyebrow">The Oracle says</p>
           <div class="whatif-sides">
-            <div class="whatif-side" id="wi-side-1">
-              <span class="mono muted">Batting first</span>
+            <div class="whatif-side t1" id="wi-side-1">
+              <span class="whatif-label"><span class="team-swatch"></span>Batting first</span>
               <span class="whatif-prob" id="wi-p1">–</span>
             </div>
-            <div class="whatif-side" id="wi-side-2">
-              <span class="mono muted">Chasing</span>
+            <div class="whatif-side t2" id="wi-side-2">
+              <span class="whatif-label"><span class="team-swatch"></span>Chasing</span>
               <span class="whatif-prob" id="wi-p2">–</span>
             </div>
           </div>
@@ -119,38 +117,40 @@
           </p>
           <p class="whatif-summary" id="wi-summary">Working out the odds…</p>
           <div class="swings" id="wi-swings" hidden>
-            <p class="mono muted" id="wi-swings-title">What moves the needle</p>
+            <h3 id="wi-swings-title">What moves the needle</h3>
             <ul class="swing-list" id="wi-swing-list"></ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="wrap section calc-heat" id="calc-heat" aria-labelledby="calc-heat-title">
-      <div class="eyebrow-row mono">
-        <h2 id="calc-heat-title" class="mono">Chase map for this target</h2>
-        <span class="bracket muted">Hover to explore</span>
+    <section class="wrap calc-heat" id="calc-heat" aria-labelledby="calc-heat-title">
+      <div class="card heat-card">
+        <div class="card-head">
+          <h2 class="h3" id="calc-heat-title">Chase map for this target</h2>
+          <p>Hover to explore nearby situations</p>
+        </div>
+        <p class="muted" id="calc-heat-caption"></p>
+        <div class="heat-wrap heat-wide" id="calc-heat-wrap">
+          <canvas id="calc-heatmap" role="img" aria-label="Chase win probability for every combination of runs required and balls remaining"></canvas>
+        </div>
+        <div class="legend">
+          <span class="legend-1">← Defending side favoured</span>
+          <span class="legend-ramp" aria-hidden="true"></span>
+          <span class="legend-2">Chasing side favoured →</span>
+        </div>
+        <p class="readout" id="calc-readout"></p>
       </div>
-      <p class="lede muted" id="calc-heat-caption"></p>
-      <div class="heat-wrap heat-wide" id="calc-heat-wrap">
-        <canvas id="calc-heatmap" role="img" aria-label="Chase win probability for every combination of runs required and balls remaining"></canvas>
-      </div>
-      <div class="legend">
-        <span class="legend-1">← Defending side favoured</span>
-        <span class="legend-ramp" aria-hidden="true"></span>
-        <span class="legend-2">Chasing side favoured →</span>
-      </div>
-      <p class="readout" id="calc-readout"></p>
     </section>
-    <section class="wrap section calc-heat-note" id="calc-heat-note" hidden>
-      <p class="lede muted">Switch to <strong>Chasing</strong> to see the chase map for a target.</p>
+    <section class="wrap calc-heat" id="calc-heat-note" hidden>
+      <p class="empty-state">Switch to <strong>Chasing</strong> to see the chase map for a target.</p>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <span class="footer-mark" aria-hidden="true">Cricket Oracle</span>
-      <div class="footer-meta mono">
+      <p class="footer-logo" aria-hidden="true" data-reveal><span class="serif">Cricket</span><strong>Oracle</strong></p>
+      <div class="footer-meta">
         <nav aria-label="Footer">
           <a href="/history">History</a>
           <a href="/upcoming">Upcoming</a>

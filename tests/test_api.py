@@ -87,9 +87,16 @@ def test_stats(client):
     assert 0.5 < body["chase_auc"] <= 1
 
 
-def test_images_lists_only_image_files(client):
+def test_logos_are_links_by_team(client):
+    body = client.get("/api/logos").json()
+    assert isinstance(body["logos"], dict)
+    assert all(isinstance(url, str) and url for url in body["logos"].values())
+
+
+def test_images_lists_photos_and_videos_separately(client):
     body = client.get("/api/images").json()
     assert all(item["name"].lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".avif")) for item in body["images"])
+    assert all(item["name"].lower().endswith((".mp4", ".webm")) for item in body["videos"])
 
 
 @pytest.mark.parametrize("path", ["/", "/history", "/upcoming", "/calculator"])

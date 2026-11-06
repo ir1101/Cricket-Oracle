@@ -7,63 +7,59 @@
   <meta name="description" content="Replay any IPL match from 2008 to 2026 with ball-by-ball win probability and a chase difficulty map.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&display=swap">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/pages.css">
+  <link rel="stylesheet" href="/css/motion.css">
+  <script>
+    // Page fades (motion.css) are skipped when a navigation interrupts them; handle that quietly.
+    for (const type of ["pageswap", "pagereveal"]) {
+      addEventListener(type, (event) => event.viewTransition?.ready.catch(() => {}));
+    }
+  </script>
   <script type="module" src="/js/history.js"></script>
 </head>
 <body data-page="history">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <section class="ticker" aria-label="Scores and model notes">
-    <div class="ticker-inner">
-      <span class="ticker-label mono">Latest</span>
-      <div class="ticker-viewport">
-        <div class="ticker-track mono" id="ticker-track"><span class="ticker-item">Loading scores…</span></div>
-      </div>
-    </div>
-  </section>
-
   <header class="site-header">
-    <div class="site-header-inner">
-      <a class="wordmark" href="/" aria-label="Cricket Oracle home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 7h2.4v14H5zM10.8 7h2.4v14h-2.4zM16.6 7H19v14h-2.4zM4 3.5h7.6v2H4zM12.4 3.5H20v2h-7.6z"/></svg>
-        Cricket Oracle
+    <div class="wrap site-header-inner">
+      <a class="logo" href="/" aria-label="Cricket Oracle home">
+        <span class="logo-top">Cricket</span>
+        <span class="logo-bottom">Oracle</span>
       </a>
       <nav class="site-nav" aria-label="Main">
         <a href="/history" data-nav="history">History</a>
-        <a href="/upcoming" class="nav-dark" data-nav="upcoming">Upcoming</a>
-        <a href="/calculator" class="nav-signal" data-nav="calculator">Calculator</a>
+        <a href="/upcoming" data-nav="upcoming">Upcoming</a>
+        <a href="/calculator" data-nav="calculator">Calculator</a>
       </nav>
+      <a class="live-pill" id="live-pill" href="/upcoming" hidden></a>
     </div>
   </header>
 
   <main id="main">
-    <section class="wrap page-head" aria-labelledby="page-title">
-      <div class="page-head-copy">
-        <p class="mono muted"><span class="index">01</span> Historical predictions</p>
-        <h1 id="page-title">Every ball<br>since 2008</h1>
-        <p class="lede">Pick any IPL match and replay it ball by ball. Watch the win probability move, and see the chase traced across the difficulty map.</p>
+    <section class="wrap page-head tool-head" aria-labelledby="page-title">
+      <p class="eyebrow">History</p>
+      <div class="page-head-row">
+        <h1 id="page-title">Every IPL match, <span class="serif">ball by ball</span></h1>
+        <div class="picker" role="group" aria-label="Choose a match">
+          <div class="field">
+            <label for="year">Season</label>
+            <select id="year"></select>
+          </div>
+          <div class="field">
+            <label for="team">Team</label>
+            <select id="team"><option value="">All teams</option></select>
+          </div>
+          <div class="field field-grow">
+            <label for="match">Match</label>
+            <select id="match" disabled><option>Loading matches…</option></select>
+          </div>
+        </div>
       </div>
-      <figure class="photo-slot cutout-wide" data-slot="history" data-eager aria-hidden="true"></figure>
     </section>
 
     <div class="wrap">
-      <section class="picker" aria-label="Choose a match">
-        <div class="field">
-          <label for="year">Season</label>
-          <select id="year"></select>
-        </div>
-        <div class="field">
-          <label for="team">Team</label>
-          <select id="team"><option value="">All teams</option></select>
-        </div>
-        <div class="field field-grow">
-          <label for="match">Match</label>
-          <select id="match" disabled><option>Loading matches…</option></select>
-        </div>
-      </section>
-
       <div class="notice" id="error" role="alert" hidden>
         <p id="error-text"></p>
         <button type="button" class="btn" id="retry">Try again</button>
@@ -71,37 +67,45 @@
 
       <section class="stage" id="stage" aria-busy="true" aria-labelledby="match-title">
         <div class="match-head">
-          <h2 id="match-title">Loading match…</h2>
-          <p class="mono muted" id="match-meta"></p>
+          <h2 id="match-title" class="match-title">Loading match…</h2>
+          <p id="match-meta"></p>
         </div>
 
         <div class="stage-grid">
-          <div class="col">
-            <div class="board">
-              <div class="team t1" id="side-1">
-                <span class="swatch"></span>
-                <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
-                <span class="team-prob"></span>
-              </div>
-              <div class="team t2" id="side-2">
-                <span class="swatch"></span>
-                <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
-                <span class="team-prob"></span>
-              </div>
-              <div class="probbar" id="probbar" aria-hidden="true"><span></span></div>
-              <p class="confidence" id="confidence">
-                <span class="confidence-label" id="confidence-label"></span>
-                <span class="confidence-note" id="confidence-note"></span>
-              </p>
-              <p class="situation" id="situation"></p>
-              <div class="ball-row">
-                <p class="this-ball" id="this-ball"></p>
-                <ol class="recent" id="recent" aria-label="Recent deliveries"></ol>
-              </div>
-              <p class="result" id="result" hidden></p>
+          <div class="card scoreboard">
+            <div class="team t1" id="side-1">
+              <span class="team-swatch"></span>
+              <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
+              <span class="team-prob"></span>
             </div>
+            <div class="team t2" id="side-2">
+              <span class="team-swatch"></span>
+              <div class="team-id"><span class="team-name"></span><span class="team-score"></span></div>
+              <span class="team-prob"></span>
+            </div>
+            <div class="probbar" id="probbar" aria-hidden="true"><span></span></div>
+            <p class="confidence" id="confidence">
+              <span class="confidence-label" id="confidence-label"></span>
+              <span class="confidence-note" id="confidence-note"></span>
+            </p>
+            <p class="situation" id="situation"></p>
+            <div class="ball-row">
+              <p class="this-ball" id="this-ball"></p>
+              <ol class="recent" id="recent" aria-label="Recent deliveries"></ol>
+            </div>
+            <p class="result" id="result" hidden></p>
+          </div>
 
-            <div class="controls">
+          <figure class="card chart-card">
+            <figcaption class="card-head">
+              <h3>Win probability</h3>
+              <p id="chart-caption">Above the line, the side batting first is favoured</p>
+            </figcaption>
+            <svg id="chart" class="wp-chart" role="img" aria-label="Win probability for each side across the match"></svg>
+            <p class="chart-readout" id="chart-readout">Hover to read any ball · click or drag to jump to it</p>
+          </figure>
+
+          <div class="card transport-bar">
             <div class="transport" role="group" aria-label="Replay controls">
               <button type="button" class="btn btn-icon" id="to-start" aria-label="First ball">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h2v14H5zM19 5v14L8 12z"/></svg>
@@ -119,8 +123,14 @@
               <button type="button" class="btn btn-icon" id="to-end" aria-label="Last ball">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 5h2v14h-2zM5 5v14l11-7z"/></svg>
               </button>
+            </div>
+            <div class="scrub">
+              <input type="range" id="scrubber" min="0" max="0" value="0" aria-label="Delivery">
+              <span class="position" id="position"></span>
+            </div>
+            <div class="transport-extra">
               <button type="button" class="btn" id="to-chase">Jump to chase</button>
-              <label class="speed mono" for="speed">Speed
+              <label class="speed" for="speed">Speed
                 <select id="speed">
                   <option value="1">1 ball/s</option>
                   <option value="3" selected>3 balls/s</option>
@@ -128,66 +138,52 @@
                   <option value="20">20 balls/s</option>
                 </select>
               </label>
+              <a class="btn btn-arrow" id="to-calculator" href="/calculator">Calculator</a>
             </div>
-            <div class="scrub">
-              <input type="range" id="scrubber" min="0" max="0" value="0" aria-label="Delivery">
-              <span class="position" id="position"></span>
-            </div>
-            <div class="scrub-foot">
-              <p class="hint">Space plays or pauses · ← → step a ball · Shift moves six</p>
-              <a class="btn btn-arrow" id="to-calculator" href="/calculator">This ball in the calculator</a>
-            </div>
-            </div>
-
-            <figure class="figure chart-fig">
-              <figcaption class="figure-head">
-                <h3>Win probability</h3>
-                <span class="mono muted">Above the midline, the side batting first is favoured</span>
-              </figcaption>
-              <svg id="chart" class="wp-chart" role="img" aria-label="Win probability for each side across the match"></svg>
-              <p class="chart-readout" id="chart-readout">Hover to read any ball · click or drag to jump to it</p>
-            </figure>
-
-            <section class="moments" aria-labelledby="moments-title">
-              <div class="figure-head">
-                <h3 id="moments-title">Swing moments</h3>
-                <span class="mono muted">The balls that moved the odds most, so far</span>
-              </div>
-              <ol class="moments-list" id="moments"></ol>
-            </section>
+            <p class="transport-hint">Space plays or pauses · ← → step a ball · Shift moves six</p>
           </div>
 
-          <div class="col">
-            <figure class="figure">
-              <figcaption class="figure-head">
-                <h3>Chase difficulty</h3>
-                <span class="muted" id="heat-caption"></span>
-              </figcaption>
-              <div class="heat-controls">
-                <label class="mono" for="wickets">Wickets in hand <output id="wickets-out" for="wickets">10</output></label>
-                <input type="range" id="wickets" min="1" max="10" value="10">
-                <label class="check"><input type="checkbox" id="follow" checked> Follow the match</label>
-              </div>
-              <div class="heat-wrap" id="heat-wrap">
-                <canvas id="heatmap" role="img" aria-label="Chase win probability for every combination of runs required and balls remaining"></canvas>
-              </div>
-              <div class="legend">
-                <span class="legend-1" id="legend-1"></span>
-                <span class="legend-ramp" aria-hidden="true"></span>
-                <span class="legend-2" id="legend-2"></span>
-              </div>
-              <p class="readout" id="readout"></p>
-            </figure>
-          </div>
+          <figure class="card heat-card">
+            <figcaption class="card-head">
+              <h3>Chase difficulty</h3>
+              <p id="heat-caption"></p>
+            </figcaption>
+            <div class="heat-controls">
+              <label for="wickets">Wickets in hand <output id="wickets-out" for="wickets">10</output></label>
+              <input type="range" id="wickets" min="1" max="10" value="10">
+              <label class="check"><input type="checkbox" id="follow" checked> Follow the match</label>
+            </div>
+            <div class="heat-wrap" id="heat-wrap">
+              <canvas id="heatmap" role="img" aria-label="Chase win probability for every combination of runs required and balls remaining"></canvas>
+            </div>
+            <div class="legend">
+              <span class="legend-1" id="legend-1"></span>
+              <span class="legend-ramp" aria-hidden="true"></span>
+              <span class="legend-2" id="legend-2"></span>
+            </div>
+            <p class="readout" id="readout"></p>
+          </figure>
+
+          <section class="card moments-card" aria-labelledby="moments-title">
+            <div class="card-head">
+              <h3 id="moments-title">Swing moments</h3>
+              <p>The balls that moved the odds most, so far</p>
+            </div>
+            <ol class="moments-list" id="moments"></ol>
+          </section>
         </div>
       </section>
     </div>
 
-    <section class="section night" aria-labelledby="model-title">
-      <div class="wrap model">
-        <p class="mono"><span class="bracket">Model card</span></p>
-        <h2 id="model-title">How good are the odds?</h2>
-        <p class="muted model-split" id="split">Loading model metrics…</p>
+    <section class="section model-section" aria-labelledby="model-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Model card</p>
+            <h2 id="model-title">How good <span class="serif">are the odds?</span></h2>
+          </div>
+          <p class="lede" id="split">Loading model metrics…</p>
+        </div>
         <div class="model-grid" id="model-grid"></div>
       </div>
     </section>
@@ -195,8 +191,8 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <span class="footer-mark" aria-hidden="true">Cricket Oracle</span>
-      <div class="footer-meta mono">
+      <p class="footer-logo" aria-hidden="true" data-reveal><span class="serif">Cricket</span><strong>Oracle</strong></p>
+      <div class="footer-meta">
         <nav aria-label="Footer">
           <a href="/history">History</a>
           <a href="/upcoming">Upcoming</a>

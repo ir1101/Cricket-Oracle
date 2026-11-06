@@ -11,9 +11,12 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 
-from oracle import config
+from oracle import config, logos
 
 SCORE = re.compile(r"(?P<runs>\d+)(?:/(?P<wickets>\d+))?\s*\((?P<overs>\d+)(?:\.(?P<balls>\d))?\)")
+# The feed tags some shorter formats as "t20" (Hong Kong Sixes play 5 overs a side). The models only
+# know men's 20-over cricket, so those series are left out along with women's matches.
+OUT_OF_SCOPE_SERIES = ("women", "sixes", "t10", "hundred")
 SHORT_NAME = re.compile(r"\s*\[(?P<short>[^\]]+)\]\s*$")
 STATED_START = re.compile(r"starts at (?P<month>[A-Z][a-z]{2}) (?P<day>\d{1,2}), (?P<hour>\d{1,2}):(?P<minute>\d{2}) GMT")
 
@@ -111,6 +114,14 @@ def fixture_start(item):
     return min(candidates, key=lambda c: abs(c - base)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def in_scope(series, team1, team2):
+    """True for men's 20-over matches, the only ones the models were trained on."""
+    name = (series or "").casefold()
+    if any(word in name for word in OUT_OF_SCOPE_SERIES):
+        return False
+    return not any(team.casefold().endswith(" women") for team in (team1, team2))
+
+
 def competition_for(series, team1, team2):
     """Best-guess competition code for a fixture, or None for women's and unknown competitions."""
     name = (series or "").casefold()
@@ -154,14 +165,19 @@ def live_odds(item, team1, team2, oracle):
     }
 
 
-def build_fixtures(payload, prematch=None, oracle=None):
-    """Men's T20 fixtures from a cricScore payload: live first, then upcoming by start, then recent results."""
+def build_fixtures(payload, prematch=None, oracle=None, known_logos=None, local_logos=None):
+    """Men's T20 fixtures from a cricScore payload: live first, then upcoming by start, then recent results.
+
+    `known_logos` and `local_logos` default to the logo cache and web/images/logos/.
+    """
+    known = logos.load() if known_logos is None else known_logos
+    local = logos.local_files() if local_logos is None else local_logos
     fixtures = []
     for item in payload.get("data") or []:
         if (item.get("matchType") or "").lower() != "t20":
             continue
         (team1, short1), (team2, short2) = split_team(item.get("t1")), split_team(item.get("t2"))
-        if not team1 or not team2:
+        if not team1 or not team2 or not in_scope(item.get("series"), team1, team2):
             continue
         state = {"live": "live", "result": "result"}.get(item.get("ms"), "upcoming")
         start = fixture_start(item)
@@ -177,6 +193,8 @@ def build_fixtures(payload, prematch=None, oracle=None):
             "team2": team2,
             "short1": short1,
             "short2": short2,
+            "logo1": logos.team_logo(team1, item.get("t1img"), known, local),
+            "logo2": logos.team_logo(team2, item.get("t2img"), known, local),
             "score1": item.get("t1s") or "",
             "score2": item.get("t2s") or "",
             "prematch": prematch.predict(team1, team2, competition, int(start[:4]) if start else None) if prematch else None,
@@ -199,6 +217,7 @@ def upcoming(prematch=None, oracle=None, now=None):
         payload, fetched_at = fetch_scores(key, now)
     except FixtureError as error:
         return {"status": "error", "message": str(error), "matches": []}
+    logos.remember(logos.from_fixtures(payload))  # so the replay pages can show these teams' logos too
     info = payload.get("info") or {}
     return {
         "status": "ok",

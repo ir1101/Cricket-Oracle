@@ -1,21 +1,63 @@
 {
-  "k": 16,
-  "season_carry": 1.0,
   "test_start": "2026-01-01",
   "all_competitions": {
     "matches": 462,
-    "log_loss": 0.6809,
-    "brier": 0.2435,
-    "auc": 0.6019,
-    "ece": 0.0592,
+    "log_loss": 0.6818,
+    "brier": 0.2442,
+    "auc": 0.5928,
+    "ece": 0.0436,
     "coin_flip_log_loss": 0.6931
   },
   "ipl": {
     "matches": 71,
-    "log_loss": 0.6886,
-    "brier": 0.2478,
-    "auc": 0.5017,
-    "ece": 0.1492,
+    "log_loss": 0.6931,
+    "brier": 0.25,
+    "auc": 0.5,
+    "ece": 0.1338,
     "coin_flip_log_loss": 0.6931
+  },
+  "elo_only": {
+    "all_competitions": {
+      "matches": 462,
+      "log_loss": 0.681,
+      "brier": 0.2435,
+      "auc": 0.6019,
+      "ece": 0.0575,
+      "coin_flip_log_loss": 0.6931
+    },
+    "ipl": {
+      "matches": 71,
+      "log_loss": 0.6886,
+      "brier": 0.2478,
+      "auc": 0.5017,
+      "ece": 0.1492,
+      "coin_flip_log_loss": 0.6931
+    }
+  },
+  "slopes": {
+    "bbl": 0.587,
+    "blast": 0.605,
+    "bpl": 0.696,
+    "cpl": 0.418,
+    "csa_t20": 0.151,
+    "ilt20": 0.175,
+    "ipl": 0.0,
+    "lpl": 0.005,
+    "mlc": 0.206,
+    "msl": 1.0,
+    "psl": 0.358,
+    "sa20": 0.0,
+    "smat": 0.79,
+    "super_smash": 0.0,
+    "t20i": 0.773
+  },
+  "target_slopes_by_season": {
+    "2021": 0.162,
+    "2022": 0.184,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0,
+    "2027": 0.0
   }
 }

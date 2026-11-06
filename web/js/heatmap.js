@@ -1,27 +1,14 @@
 // Chase-difficulty heatmap: P(chase succeeds) over runs required x balls remaining, drawn on canvas.
-import { clamp } from "./core.js";
+import { clamp, hexToOklab } from "./core.js";
 
 const MARGIN = { l: 52, r: 14, t: 14, b: 44 };
-// Dark theme: unreachable states sit at the panel colour and a 50-50 contest is a dim grey, so
-// only decisive situations glow blue or orange.
-const UNREACHABLE = [20, 20, 20];
-const NEUTRAL = "#383838";
+// Unreachable states sit at the panel colour and a 50-50 contest is a dim warm grey, so only
+// decisive situations glow in the two sides' colours.
+const UNREACHABLE = [20, 20, 19];
+const NEUTRAL = "#2a2a27";
 
 // Interpolating in OKLab keeps equal probability steps looking equal on both sides of 50%.
-const toLinear = (c) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 const toSrgb = (c) => Math.round(255 * clamp(c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055, 0, 1));
-
-function hexToOklab(hex) {
-  const [r, g, b] = [1, 3, 5].map((i) => toLinear(parseInt(hex.slice(i, i + 2), 16)));
-  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-  return [
-    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
-  ];
-}
 
 function oklabToRgb([L, a, b]) {
   const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
@@ -34,8 +21,13 @@ function oklabToRgb([L, a, b]) {
   ].map(toSrgb);
 }
 
+// Very light end colours (chalk, volt, yellow) would turn half the map near-white, so their
+// lightness is capped; hue and chroma are kept.
+const MAX_LIGHTNESS = 0.8;
+
 function buildRamp(low, high) {
-  const stops = [low, NEUTRAL, high].map(hexToOklab);
+  const cap = ([L, a, b]) => [Math.min(L, MAX_LIGHTNESS), a, b];
+  const stops = [cap(hexToOklab(low)), hexToOklab(NEUTRAL), cap(hexToOklab(high))];
   return Array.from({ length: 256 }, (_, i) => {
     const p = i / 255;
     const [from, to, f] = p <= 0.5 ? [stops[0], stops[1], p * 2] : [stops[1], stops[2], (p - 0.5) * 2];
@@ -89,7 +81,7 @@ const niceStep = (range) => [10, 20, 25, 50, 100].find((s) => range / s <= 6) ??
 export function createHeatmap(canvas, { onHover } = {}) {
   const css = getComputedStyle(document.documentElement);
   const token = (name) => css.getPropertyValue(name).trim();
-  const ramp = buildRamp(token("--team1-fill"), token("--team2-fill"));
+  let ramp = buildRamp(token("--side-1"), token("--side-2"));
   const state = { entry: null, path: [], marker: null, hover: null };
 
   function layout() {
@@ -116,14 +108,15 @@ export function createHeatmap(canvas, { onHover } = {}) {
     const rows = grid.target;
     const xOf = (b) => MARGIN.l + ((cols - clamp(b, 0, cols)) / cols) * w;
     const yOf = (r) => MARGIN.t + ((rows - clamp(r, 0, rows)) / rows) * h;
-    const ink = token("--ink");
-    const muted = token("--ink-2");
-    const paper = token("--paper");
+    const ink = token("--text");
+    const muted = token("--text-2");
+    const paper = token("--panel");
+    const volt = token("--volt");
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(image, MARGIN.l, MARGIN.t, w, h);
-    ctx.strokeStyle = token("--rule-strong");
+    ctx.strokeStyle = token("--line-2");
     ctx.lineWidth = 1;
     ctx.strokeRect(MARGIN.l + 0.5, MARGIN.t + 0.5, w - 1, h - 1);
 
@@ -146,7 +139,7 @@ export function createHeatmap(canvas, { onHover } = {}) {
     ctx.stroke();
     ctx.restore();
 
-    ctx.font = `11px ${token("--font-mono")}`;
+    ctx.font = `600 11px ${token("--font-sans")}`;
     ctx.fillStyle = muted;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
@@ -177,8 +170,8 @@ export function createHeatmap(canvas, { onHover } = {}) {
 
     if (state.marker && state.marker.runs_required <= rows) {
       ctx.beginPath();
-      ctx.arc(xOf(state.marker.balls_remaining), yOf(state.marker.runs_required), 6, 0, Math.PI * 2);
-      ctx.fillStyle = ink;
+      ctx.arc(xOf(state.marker.balls_remaining), yOf(state.marker.runs_required), 6.5, 0, Math.PI * 2);
+      ctx.fillStyle = volt;
       ctx.fill();
       ctx.lineWidth = 2;
       ctx.strokeStyle = paper;
@@ -224,6 +217,12 @@ export function createHeatmap(canvas, { onHover } = {}) {
     setGrid(grid) {
       state.entry = rasterize(grid, ramp);
       state.hover = null;
+      draw();
+    },
+    /** Recolour the map: `low` for the defending side, `high` for the chasing side. */
+    setColors(low, high) {
+      ramp = buildRamp(low, high);
+      if (state.entry) state.entry = rasterize(state.entry.grid, ramp);
       draw();
     },
     setPath(points) {

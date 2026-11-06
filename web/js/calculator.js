@@ -1,4 +1,4 @@
-import { api, clamp, confidence, confidenceLabel, fillSelect, h, initChrome, overs, pct, plural } from "./core.js";
+import { api, clamp, confidence, confidenceLabel, fillSelect, h, initChrome, overs, pct, plural, stopTween, tweenPercent } from "./core.js";
 import { createHeatmap } from "./heatmap.js";
 
 const FIELDS = ["runs", "wickets", "overs", "target"];
@@ -17,6 +17,8 @@ const els = {
   targetField: $("wi-target-field"),
   p1: $("wi-p1"),
   p2: $("wi-p2"),
+  side1: $("wi-side-1"),
+  side2: $("wi-side-2"),
   bar: $("wi-bar"),
   summary: $("wi-summary"),
   confidence: $("wi-confidence"),
@@ -77,7 +79,11 @@ function scheduleWhatIf() {
 
 function setUnavailable(state, message) {
   els.result.dataset.state = state;
+  stopTween(els.p1);
+  stopTween(els.p2);
   els.p1.textContent = els.p2.textContent = "–";
+  delete els.side1.dataset.fav;
+  delete els.side2.dataset.fav;
   els.summary.textContent = message;
   els.swings.hidden = true;
   els.confidence.hidden = true;
@@ -135,8 +141,10 @@ function describeWhatIf({ innings, runs, wickets, balls, target, venue }, venueP
 
 function renderWhatIf(value, body) {
   const pFirst = value.innings === 1 ? body.p_batting_side_wins : 1 - body.p_batting_side_wins;
-  els.p1.textContent = pct(pFirst);
-  els.p2.textContent = pct(1 - pFirst);
+  tweenPercent(els.p1, pFirst, { initial: 0.5 });
+  tweenPercent(els.p2, 1 - pFirst, { initial: 0.5 });
+  els.side1.dataset.fav = String(pFirst >= 0.5);
+  els.side2.dataset.fav = String(pFirst < 0.5);
   els.bar.style.setProperty("--p", pFirst);
   els.summary.textContent = describeWhatIf(value, body.venue_par);
   els.result.dataset.state = "ready";
@@ -192,11 +200,13 @@ async function renderSwings(value, base, request) {
       if (!results[i]) return null;
       const p = results[i].p_batting_side_wins;
       const diff = Math.round((p - base) * 100);
-      return h("li", { class: `swing${diff > 0 ? " is-up" : diff < 0 ? " is-down" : ""}` },
+      const row = h("li", { class: `swing${diff > 0 ? " is-up" : diff < 0 ? " is-down" : ""}` },
         h("span", { class: "swing-label", text: label }),
         h("span", { class: "swing-value tabular", text: pct(p) }),
-        h("span", { class: "swing-diff mono tabular", text: diff === 0 ? "±0" : `${diff > 0 ? "+" : "−"}${Math.abs(diff)}` }),
+        h("span", { class: "swing-diff tabular", text: diff === 0 ? "±0" : `${diff > 0 ? "+" : "−"}${Math.abs(diff)}` }),
       );
+      row.style.setProperty("--i", i); // rows cascade in
+      return row;
     }),
   );
   els.swings.hidden = false;

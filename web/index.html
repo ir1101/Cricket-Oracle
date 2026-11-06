@@ -7,184 +7,159 @@
   <meta name="description" content="Calibrated ball-by-ball win probability for IPL cricket: match replays, live fixtures and a what-if calculator.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&display=swap">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/pages.css">
+  <link rel="stylesheet" href="/css/motion.css">
+  <script>
+    // Page fades (motion.css) are skipped when a navigation interrupts them; handle that quietly.
+    for (const type of ["pageswap", "pagereveal"]) {
+      addEventListener(type, (event) => event.viewTransition?.ready.catch(() => {}));
+    }
+  </script>
   <script type="module" src="/js/home.js"></script>
 </head>
 <body data-page="home">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <section class="ticker" aria-label="Scores and model notes">
-    <div class="ticker-inner">
-      <span class="ticker-label mono">Latest</span>
-      <div class="ticker-viewport">
-        <div class="ticker-track mono" id="ticker-track"><span class="ticker-item">Loading scores…</span></div>
-      </div>
-    </div>
-  </section>
-
   <header class="site-header">
-    <div class="site-header-inner">
-      <a class="wordmark" href="/" aria-label="Cricket Oracle home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 7h2.4v14H5zM10.8 7h2.4v14h-2.4zM16.6 7H19v14h-2.4zM4 3.5h7.6v2H4zM12.4 3.5H20v2h-7.6z"/></svg>
-        Cricket Oracle
+    <div class="wrap site-header-inner">
+      <a class="logo" href="/" aria-label="Cricket Oracle home">
+        <span class="logo-top">Cricket</span>
+        <span class="logo-bottom">Oracle</span>
       </a>
       <nav class="site-nav" aria-label="Main">
         <a href="/history" data-nav="history">History</a>
-        <a href="/upcoming" class="nav-dark" data-nav="upcoming">Upcoming</a>
-        <a href="/calculator" class="nav-signal" data-nav="calculator">Calculator</a>
+        <a href="/upcoming" data-nav="upcoming">Upcoming</a>
+        <a href="/calculator" data-nav="calculator">Calculator</a>
       </nav>
+      <a class="live-pill" id="live-pill" href="/upcoming" hidden></a>
     </div>
   </header>
 
   <main id="main">
-    <section class="hero wrap" aria-labelledby="hero-title">
-      <h1 id="hero-title">
-        <span class="hero-kicker">Ball-by-ball win probability for</span>
-        <span class="display-xl">T20 cricket</span>
-      </h1>
-      <div class="hero-foot">
+    <section class="hero" aria-labelledby="hero-title">
+      <svg class="field-lines" viewBox="0 0 600 560" aria-hidden="true" focusable="false">
+        <ellipse cx="300" cy="280" rx="292" ry="272"/>
+        <ellipse cx="300" cy="280" rx="236" ry="220" class="dashed"/>
+        <ellipse cx="300" cy="280" rx="150" ry="138"/>
+        <ellipse cx="300" cy="280" rx="70" ry="64" class="dashed"/>
+        <rect x="292" y="236" width="16" height="88"/>
+        <path d="M284 246h32M284 314h32"/>
+      </svg>
+      <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="lede">Every IPL delivery since 2008, replayed with calibrated odds. Plus live fixtures, and a calculator for any situation you can dream up.</p>
+          <h1 id="hero-title" class="hero-title">Ball-by-ball odds for <span class="serif">T20 cricket</span></h1>
+          <div class="hero-board" aria-live="polite">
+            <p class="eyebrow" id="hero-moment">Loading the latest final…</p>
+            <p class="hero-number tabular" id="hero-number">50%</p>
+            <p class="hero-team"><span class="team-swatch" id="hero-swatch"></span><span id="hero-team">&nbsp;</span></p>
+            <p class="hero-context" id="hero-context"></p>
+          </div>
           <div class="hero-actions">
-            <a class="btn btn-primary btn-arrow" href="/history">Replay a match</a>
-            <a class="btn btn-arrow" href="/upcoming">Upcoming matches</a>
+            <a class="btn btn-primary btn-arrow" id="hero-replay" href="/history">Replay this final</a>
+            <a class="btn" href="/calculator">Try the calculator</a>
           </div>
         </div>
-        <svg class="hero-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 7h2.4v14H5zM10.8 7h2.4v14h-2.4zM16.6 7H19v14h-2.4zM4 3.5h7.6v2H4zM12.4 3.5H20v2h-7.6z"/></svg>
-      </div>
-    </section>
-
-    <div class="cutout-band wrap" aria-hidden="true">
-      <figure class="photo-slot cutout flip" data-slot="hero" data-eager></figure>
-      <figure class="photo-slot cutout" data-slot="hero" data-eager></figure>
-      <figure class="photo-slot cutout flip" data-slot="hero"></figure>
-    </div>
-
-    <section class="wrap teaser" id="teaser" aria-labelledby="teaser-title" data-reveal>
-      <div class="teaser-panel">
-        <div class="teaser-copy">
-          <p class="mono muted"><span class="bracket">Latest final</span></p>
-          <h2 id="teaser-title">Loading the latest final…</h2>
-          <p class="muted" id="teaser-meta"></p>
-          <a class="btn btn-arrow" id="teaser-link" href="/history">Replay it ball by ball</a>
-        </div>
-        <figure class="teaser-chart">
-          <svg id="teaser-chart" class="wp-chart" role="img" aria-label="Win probability across the latest final"></svg>
-          <figcaption class="mono muted" id="teaser-caption"></figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section wrap split" aria-labelledby="intro-title" data-reveal>
-      <p class="mono muted"><span class="index">00</span> The idea</p>
-      <div class="split-body">
-        <h2 id="intro-title" class="statement">Cricket turns on single deliveries. The Oracle reads the state after every ball and turns runs, wickets, run rate and venue into odds you can trust.</h2>
-        <p class="mono muted">Logistic baseline · monotone gradient boosting · Platt calibration · tested on a season it never saw</p>
-      </div>
-    </section>
-
-    <section class="section wrap" aria-labelledby="ways-title">
-      <div class="eyebrow-row mono">
-        <h2 id="ways-title" class="mono">Three ways in</h2>
-        <span class="bracket muted">History · Upcoming · Calculator</span>
-      </div>
-      <div class="ways">
-        <article class="way" data-reveal>
-          <div class="way-copy">
-            <p class="mono muted"><span class="index">01</span> Historical predictions</p>
-            <h3 class="h2">Replay any IPL match</h3>
-            <p>Pick a match from 2008 to 2026 and watch the odds move ball by ball, with the chase traced across a difficulty map.</p>
-            <a class="btn btn-arrow" href="/history">Open history</a>
-          </div>
-          <figure class="photo-slot cutout-wide" data-slot="history" aria-hidden="true"></figure>
-        </article>
-        <article class="way" data-reveal>
-          <div class="way-copy">
-            <p class="mono muted"><span class="index">02</span> Upcoming matches</p>
-            <h3 class="h2">See who's favoured next</h3>
-            <p>Men's T20 fixtures for the next seven days, with pre-match odds from team ratings and in-play odds once the first ball is bowled.</p>
-            <a class="btn btn-arrow" href="/upcoming">See upcoming</a>
-          </div>
-          <figure class="photo-slot cutout-wide" data-slot="upcoming" aria-hidden="true"></figure>
-        </article>
-        <article class="way" data-reveal>
-          <div class="way-copy">
-            <p class="mono muted"><span class="index">03</span> Calculator</p>
-            <h3 class="h2">Ask about any situation</h3>
-            <p>Set the score, overs, wickets and target. Get both sides' chances, and the chase map for that target with your situation marked on it.</p>
-            <a class="btn btn-arrow" href="/calculator">Open calculator</a>
-          </div>
-          <figure class="photo-slot cutout-wide" data-slot="calculator" aria-hidden="true"></figure>
-        </article>
-      </div>
-    </section>
-
-    <section class="spotlight night" aria-labelledby="stats-title">
-      <figure class="photo-slot" data-slot="spotlight" aria-hidden="true"></figure>
-      <div class="spotlight-scrim" aria-hidden="true"></div>
-      <div class="wrap section spotlight-body" data-reveal>
-        <p class="mono"><span class="bracket">By the numbers</span></p>
-        <h2 id="stats-title">Tested on a season<br>it never saw</h2>
-        <div class="stats">
-          <div class="stat">
-            <span class="counter" id="stat-auc">–</span>
-            <span class="mono muted">Chase AUC on the <span data-stat="test-season">held-out</span> season</span>
-          </div>
-          <div class="stat">
-            <span class="counter" id="stat-ipl">–</span>
-            <span class="mono muted">IPL matches modelled</span>
-          </div>
-          <div class="stat">
-            <span class="counter" id="stat-deliveries">–</span>
-            <span class="mono muted">IPL deliveries replayable</span>
-          </div>
-          <div class="stat">
-            <span class="counter" id="stat-competitions">–</span>
-            <span class="mono muted">T20 competitions feeding venue pars</span>
+        <figure class="photo hero-photo" data-photo="hero" data-video="hero-loop" data-eager aria-hidden="true"></figure>
+        <div class="hero-strip">
+          <svg id="hero-spark" class="spark wp-chart" role="img" aria-label="Win probability across the latest final"></svg>
+          <div class="hero-strip-foot">
+            <p class="muted small" id="hero-spark-caption"></p>
+            <a class="link-arrow scroll-cue" href="#replay">Scroll to replay it</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section night" aria-labelledby="engine-title">
-      <div class="wrap engine" data-reveal>
-        <div class="engine-head">
-          <h2 id="engine-title">Under the hood</h2>
-          <p class="lede muted">A small, honest pipeline. Every choice was made on validation seasons, and the test season stayed sealed until the end.</p>
+    <section class="replay" id="replay" aria-labelledby="replay-title">
+      <div class="replay-sticky">
+        <div class="wrap replay-inner">
+          <div class="replay-head">
+            <p class="eyebrow">The final, ball by ball</p>
+            <h2 id="replay-title">Watch the odds <span class="serif">move</span></h2>
+          </div>
+          <div class="replay-board">
+            <div class="replay-side t1">
+              <span class="replay-team"><span class="team-swatch"></span><span id="rp-team-1"></span></span>
+              <span class="replay-prob tabular" id="rp-p1">–</span>
+            </div>
+            <div class="replay-side t2">
+              <span class="replay-team"><span class="team-swatch"></span><span id="rp-team-2"></span></span>
+              <span class="replay-prob tabular" id="rp-p2">–</span>
+            </div>
+            <div class="probbar" id="rp-bar" aria-hidden="true"><span></span></div>
+            <p class="replay-ball" id="rp-ball"></p>
+            <p class="replay-score muted" id="rp-score"></p>
+          </div>
+          <div class="replay-chart">
+            <svg id="rp-chart" class="wp-chart" role="img" aria-label="Win probability up to the current ball"></svg>
+          </div>
+          <div class="replay-foot">
+            <div class="replay-progress" aria-hidden="true"><span id="rp-progress"></span></div>
+            <p class="muted small" id="rp-progress-text">Scroll to play the match</p>
+            <a class="link-arrow" id="rp-open" href="/history">Open it in History</a>
+          </div>
         </div>
-        <ul class="feature-list mono">
-          <li>Ball-by-ball innings states</li>
-          <li>Run-rate trajectory</li>
-          <li>Wickets in hand</li>
-          <li>Venue pars from 15 competitions</li>
-          <li>Recency-weighted training</li>
-          <li>Logistic baseline</li>
-          <li>Monotone gradient boosting</li>
-          <li>Platt calibration</li>
-          <li>Season-based validation</li>
-          <li>Chase difficulty heatmap</li>
-          <li>Elo team ratings</li>
-          <li>Live fixtures feed</li>
-        </ul>
       </div>
     </section>
 
-    <section class="section wrap split" aria-labelledby="honest-title" data-reveal>
-      <p class="mono muted"><span class="index">04</span> A straight answer</p>
-      <div class="split-body">
-        <h2 id="honest-title" class="statement">Before the first ball, T20 is close to a coin toss. Once it starts, the picture sharpens fast.</h2>
-        <p class="lede muted">Team ratings only nudge pre-match odds, and the Upcoming page shows exactly how much to trust them. In-play odds are where the model earns its keep.</p>
-        <a class="btn btn-arrow" href="/upcoming">See upcoming matches</a>
+    <section class="section wrap ways" aria-labelledby="ways-title">
+      <div class="section-head" data-reveal>
+        <h2 id="ways-title">Three ways <span class="serif">in</span></h2>
+        <p class="lede">Replay the past, check this week's fixtures, or ask about any situation you can think of.</p>
+      </div>
+      <ol class="ways-list" data-reveal data-stagger>
+        <li>
+          <a class="way-row" href="/history">
+            <span class="way-index">01</span>
+            <span class="way-name">Replay<sup class="way-count" id="way-count-history"></sup></span>
+            <span class="way-desc">Every IPL match since 2008, with the odds after every ball and the chase traced across a difficulty map.</span>
+            <span class="way-arrow" aria-hidden="true">→</span>
+            <figure class="photo way-peek" data-photo="history" aria-hidden="true"></figure>
+          </a>
+        </li>
+        <li>
+          <a class="way-row" href="/upcoming">
+            <span class="way-index">02</span>
+            <span class="way-name">Upcoming<sup class="way-count" id="way-count-upcoming"></sup></span>
+            <span class="way-desc">Men's T20 fixtures for the next seven days, with live in-play odds once the first ball is bowled.</span>
+            <span class="way-arrow" aria-hidden="true">→</span>
+            <figure class="photo way-peek" data-photo="upcoming" aria-hidden="true"></figure>
+          </a>
+        </li>
+        <li>
+          <a class="way-row" href="/calculator">
+            <span class="way-index">03</span>
+            <span class="way-name">Calculator<sup class="way-count">any situation</sup></span>
+            <span class="way-desc">Set the score, overs, wickets and target. Get both sides' chances and the map of the chase from there.</span>
+            <span class="way-arrow" aria-hidden="true">→</span>
+            <figure class="photo way-peek" data-photo="calculator" aria-hidden="true"></figure>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section sure" aria-labelledby="sure-title">
+      <figure class="photo sure-photo" data-photo="stadium" aria-hidden="true"></figure>
+      <div class="wrap sure-inner">
+        <div class="section-head" data-reveal>
+          <h2 id="sure-title">How sure <span class="serif">is it?</span></h2>
+          <p class="lede" id="sure-lede">Each recent season was predicted by a model that had never seen it. This is how often its favourite went on to win.</p>
+        </div>
+        <div class="sure-grid" id="sure-grid" data-reveal data-stagger></div>
+        <p class="sure-foot" data-reveal>
+          <span class="muted">Early in a match, T20 is close to a coin toss. Once a chase is under way, the picture sharpens fast.</span>
+          <a class="link-arrow" href="/history#model-title">See the model card</a>
+        </p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <span class="footer-mark" aria-hidden="true">Cricket Oracle</span>
-      <div class="footer-meta mono">
+      <p class="footer-logo" aria-hidden="true" data-reveal><span class="serif">Cricket</span><strong>Oracle</strong></p>
+      <div class="footer-meta">
         <nav aria-label="Footer">
           <a href="/history">History</a>
           <a href="/upcoming">Upcoming</a>

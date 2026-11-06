@@ -7,63 +7,66 @@
   <meta name="description" content="Men's T20 fixtures for the next seven days with pre-match ratings and live in-play win probability.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&display=swap">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/pages.css">
+  <link rel="stylesheet" href="/css/motion.css">
+  <script>
+    // Page fades (motion.css) are skipped when a navigation interrupts them; handle that quietly.
+    for (const type of ["pageswap", "pagereveal"]) {
+      addEventListener(type, (event) => event.viewTransition?.ready.catch(() => {}));
+    }
+  </script>
   <script type="module" src="/js/upcoming.js"></script>
 </head>
 <body data-page="upcoming">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <section class="ticker" aria-label="Scores and model notes">
-    <div class="ticker-inner">
-      <span class="ticker-label mono">Latest</span>
-      <div class="ticker-viewport">
-        <div class="ticker-track mono" id="ticker-track"><span class="ticker-item">Loading scores…</span></div>
-      </div>
-    </div>
-  </section>
-
   <header class="site-header">
-    <div class="site-header-inner">
-      <a class="wordmark" href="/" aria-label="Cricket Oracle home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 7h2.4v14H5zM10.8 7h2.4v14h-2.4zM16.6 7H19v14h-2.4zM4 3.5h7.6v2H4zM12.4 3.5H20v2h-7.6z"/></svg>
-        Cricket Oracle
+    <div class="wrap site-header-inner">
+      <a class="logo" href="/" aria-label="Cricket Oracle home">
+        <span class="logo-top">Cricket</span>
+        <span class="logo-bottom">Oracle</span>
       </a>
       <nav class="site-nav" aria-label="Main">
         <a href="/history" data-nav="history">History</a>
-        <a href="/upcoming" class="nav-dark" data-nav="upcoming">Upcoming</a>
-        <a href="/calculator" class="nav-signal" data-nav="calculator">Calculator</a>
+        <a href="/upcoming" data-nav="upcoming">Upcoming</a>
+        <a href="/calculator" data-nav="calculator">Calculator</a>
       </nav>
+      <a class="live-pill" id="live-pill" href="/upcoming" hidden></a>
     </div>
   </header>
 
   <main id="main">
-    <section class="wrap page-head" aria-labelledby="page-title">
-      <div class="page-head-copy">
-        <p class="mono muted"><span class="index">02</span> Upcoming matches</p>
-        <h1 id="page-title">The next<br>seven days</h1>
+    <section class="wrap page-head tool-head" aria-labelledby="page-title">
+      <p class="eyebrow">Upcoming</p>
+      <div class="page-head-row">
+        <h1 id="page-title">The next <span class="serif">seven days</span></h1>
         <p class="lede">Men's T20 fixtures and live games from CricketData.org. Before a match, odds come from team ratings. Once it's under way, the in-play model takes over.</p>
       </div>
-      <figure class="photo-slot cutout-wide" data-slot="upcoming" data-eager aria-hidden="true"></figure>
+    </section>
+
+    <section class="wrap" id="nextup-section" aria-labelledby="nextup-title" hidden>
+      <h2 class="visually-hidden" id="nextup-title">Next up</h2>
+      <ol class="nextup" id="nextup"></ol>
     </section>
 
     <div class="wrap">
       <div class="fixtures-toolbar">
-        <fieldset class="segmented" id="filter">
-          <legend>Show</legend>
-          <div class="segmented-options">
-            <label><input type="radio" name="show" value="all" checked> All <span class="filter-count" data-count-for="all"></span></label>
-            <label><input type="radio" name="show" value="live"> Live <span class="filter-count" data-count-for="live"></span></label>
-            <label><input type="radio" name="show" value="upcoming"> Upcoming <span class="filter-count" data-count-for="upcoming"></span></label>
-            <label><input type="radio" name="show" value="result"> Results <span class="filter-count" data-count-for="result"></span></label>
+        <fieldset class="chips" id="filter">
+          <legend class="visually-hidden">Show</legend>
+          <div class="chip-list">
+            <label class="chip-option"><input type="radio" name="show" value="all" checked> All <span class="chip-count" data-count-for="all"></span></label>
+            <label class="chip-option"><input type="radio" name="show" value="live"> Live <span class="chip-count" data-count-for="live"></span></label>
+            <label class="chip-option"><input type="radio" name="show" value="upcoming"> Upcoming <span class="chip-count" data-count-for="upcoming"></span></label>
+            <label class="chip-option"><input type="radio" name="show" value="result"> Results <span class="chip-count" data-count-for="result"></span></label>
           </div>
         </fieldset>
-        <p class="mono muted" id="updated"></p>
+        <p class="muted small" id="updated"></p>
       </div>
 
-      <div class="key-panel night" id="key-panel" hidden>
-        <p class="mono"><span class="bracket">Setup needed</span></p>
+      <div class="card key-panel" id="key-panel" hidden>
+        <p class="eyebrow">Setup needed</p>
         <h2 class="h3">Add a CricketData.org API key</h2>
         <p>Fixtures come from CricketData.org's free API. Create a file named <code>.env</code> in the project folder containing <code>CRICKETDATA_API_KEY=your-key</code>, then restart the server. The key stays on your machine and is never committed.</p>
         <a class="btn btn-arrow" href="https://cricketdata.org" rel="noopener">Get a free key</a>
@@ -74,45 +77,47 @@
         <button type="button" class="btn" id="retry">Try again</button>
       </div>
 
-      <div class="fixture-grid fixture-loading" id="loading" aria-hidden="true">
-        <div class="fixture skeleton"></div>
-        <div class="fixture skeleton"></div>
-        <div class="fixture skeleton"></div>
+      <div class="fixture-grid" id="loading" aria-hidden="true">
+        <div class="card fixture skeleton"></div>
+        <div class="card fixture skeleton"></div>
+        <div class="card fixture skeleton"></div>
       </div>
 
-      <p class="fixture-empty" id="empty" hidden>No men's T20 matches in CricketData.org's seven-day window right now.</p>
-      <p class="fixture-empty" id="filter-empty" hidden>Nothing in this view right now. Try another filter.</p>
+      <p class="empty-state" id="empty" hidden>No men's T20 matches in CricketData.org's seven-day window right now. Check back closer to the weekend, or replay a past match in History.</p>
+      <p class="empty-state" id="filter-empty" hidden>Nothing in this view right now. Try another filter.</p>
 
       <section class="fixture-group" data-group="live" aria-labelledby="group-live" hidden>
-        <div class="fixture-group-head"><h2 id="group-live">Live now</h2><span class="mono muted" data-count></span></div>
+        <div class="fixture-group-head"><h2 id="group-live">Live now</h2><span class="muted small" data-count></span></div>
         <div class="fixture-grid"></div>
       </section>
       <section class="fixture-group" data-group="upcoming" aria-labelledby="group-upcoming" hidden>
-        <div class="fixture-group-head"><h2 id="group-upcoming">Coming up</h2><span class="mono muted" data-count></span></div>
+        <div class="fixture-group-head"><h2 id="group-upcoming">Coming up</h2><span class="muted small" data-count></span></div>
         <div class="fixture-days"></div>
       </section>
       <section class="fixture-group" data-group="result" aria-labelledby="group-result" hidden>
-        <div class="fixture-group-head"><h2 id="group-result">Recent results</h2><span class="mono muted" data-count></span></div>
+        <div class="fixture-group-head"><h2 id="group-result">Recent results</h2><span class="muted small" data-count></span></div>
         <div class="fixture-days"></div>
       </section>
     </div>
 
-    <section class="section" aria-labelledby="trust-title">
-      <div class="wrap split">
-        <p class="mono muted"><span class="bracket">Honesty</span></p>
-        <div class="split-body">
-          <h2 id="trust-title" class="statement">Pre-match odds are a nudge, not a verdict.</h2>
-          <p class="lede muted">Team ratings are built from past results, but T20 squads change and single games are volatile. Here is how they did on matches they never saw, next to the in-play model.</p>
-          <div class="trust-stats" id="trust-stats"></div>
+    <section class="section trust" aria-labelledby="trust-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Honesty</p>
+            <h2 id="trust-title">Pre-match odds are a <span class="serif">nudge, not a verdict</span></h2>
+          </div>
+          <p class="lede">Team ratings are built from past results, but T20 squads change and single games are volatile. Here is how they did on matches they never saw, next to the in-play model.</p>
         </div>
+        <div class="trust-stats" id="trust-stats"></div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap">
-      <span class="footer-mark" aria-hidden="true">Cricket Oracle</span>
-      <div class="footer-meta mono">
+      <p class="footer-logo" aria-hidden="true" data-reveal><span class="serif">Cricket</span><strong>Oracle</strong></p>
+      <div class="footer-meta">
         <nav aria-label="Footer">
           <a href="/history">History</a>
           <a href="/upcoming">Upcoming</a>

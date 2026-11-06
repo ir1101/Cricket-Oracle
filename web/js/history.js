@@ -1,5 +1,6 @@
 import {
-  abbr, api, clamp, confidence, confidenceLabel, fillSelect, formatDate, formatNumber, h, initChrome, overs, pct, plural,
+  abbr, api, applySides, clamp, confidence, confidenceLabel, fillSelect, flash, formatDate, formatNumber, h, initChrome, overs, pct,
+  plural, teamLogos, teamMark, teamSlug, tweenPercent,
 } from "./core.js";
 import { createHeatmap } from "./heatmap.js";
 
@@ -10,7 +11,7 @@ const MODEL_LABELS = {
   calibrated: "Calibrated blend",
 };
 const CHART_MARGIN = { l: 48, r: 12, t: 12, b: 26 };
-const CHART_HEIGHT = 240;
+const CHART_HEIGHT = 260;
 const CHART_HINT = "Hover to read any ball · click or drag to jump to it";
 
 const els = Object.fromEntries(
@@ -19,7 +20,7 @@ const els = Object.fromEntries(
     "side-1", "side-2", "probbar", "confidence", "confidence-label", "confidence-note", "situation", "this-ball", "recent", "result",
     "to-start", "back", "play", "forward", "to-end", "to-chase", "to-calculator", "speed", "scrubber", "position",
     "chart", "chart-readout", "moments", "heat-caption", "wickets", "wickets-out", "follow", "heat-wrap", "heatmap", "legend-1", "legend-2",
-    "readout", "split", "model-grid",
+    "readout", "split", "model-grid", "chart-caption",
   ].map((id) => [id.replace(/-(\w)/g, (_, c) => c.toUpperCase()), document.getElementById(id)]),
 );
 
@@ -37,7 +38,10 @@ const state = {
   hover: null,
   chartHover: null,
   model: null,
+  shown: null, // the last ball on the scoreboard, so single-ball steps can be animated
+  logos: {},
 };
+const board = els.side1.closest(".scoreboard");
 
 const heatmap = createHeatmap(els.heatmap, {
   onHover(cell) {
@@ -99,6 +103,7 @@ async function loadMatch(id) {
     state.grids.clear();
     state.gridKey = "";
     state.chartHover = null;
+    state.shown = null;
 
     if (Number(els.year.value) !== data.match.year) {
       await loadListing(data.match.year, els.team.value || null, id);
@@ -156,7 +161,17 @@ function step(delta) {
 
 function renderMatchHead() {
   const m = state.match;
-  els.matchTitle.textContent = `${m.team1} v ${m.team2}`;
+  const [c1, c2] = applySides(els.stage, m.team1, m.team2);
+  heatmap.setColors(c1, c2);
+  const mark = (team) => teamMark(team, { logo: state.logos[teamSlug(team)] });
+  els.matchTitle.replaceChildren(
+    h("span", { class: "t1" }, mark(m.team1), m.team1),
+    h("span", { class: "vs", text: "v" }),
+    h("span", { class: "t2" }, mark(m.team2), m.team2),
+  );
+  els.side1.querySelector(".team-swatch, .team-mark").replaceWith(mark(m.team1));
+  els.side2.querySelector(".team-swatch, .team-mark").replaceWith(mark(m.team2));
+  els.chartCaption.textContent = `Above the line, ${abbr(m.team1)} are favoured; below it, ${abbr(m.team2)}`;
   els.matchMeta.textContent = [m.stage, formatDate(m.date, { day: "numeric", month: "long", year: "numeric" }), m.venue, m.toss]
     .filter(Boolean)
     .join(" · ");
@@ -191,12 +206,20 @@ function chipFor(t) {
 
 function setSide(el, score, p, batting) {
   el.querySelector(".team-score").textContent = score;
-  el.querySelector(".team-prob").textContent = pct(p);
+  tweenPercent(el.querySelector(".team-prob"), p, { duration: 300 });
   el.dataset.batting = String(batting);
+  el.dataset.fav = String(p >= 0.5);
 }
 
 function renderBoard(t) {
   const { match, timeline, index, inningsStart } = state;
+  // One ball forward: flash the board for a wicket, or bump the odds when they swing 8+ points.
+  const previous = state.shown;
+  state.shown = { index, p: t.p_team1 };
+  if (previous && index === previous.index + 1) {
+    if (t.wicket) flash(board, "is-wicket");
+    else if (Math.abs(t.p_team1 - previous.p) >= 0.08) flash(board, "is-swing");
+  }
   const first = t.innings === 1 ? t : timeline[inningsStart - 1];
   setSide(els.side1, `${first.runs}/${first.wickets} (${overs(first.balls)})`, t.p_team1, t.innings === 1);
   setSide(els.side2, t.innings === 2 ? `${t.runs}/${t.wickets} (${overs(t.balls)})` : "Yet to bat", 1 - t.p_team1, t.innings === 2);
@@ -334,6 +357,7 @@ function drawChart() {
     ${wickets}
     ${overTicks}
     ${guide}
+    <circle class="now-ring" cx="${x(index).toFixed(1)}" cy="${y(current.p_team1).toFixed(1)}" r="4.5"/>
     <circle class="now" cx="${x(index).toFixed(1)}" cy="${y(current.p_team1).toFixed(1)}" r="4.5"/>`;
 }
 
@@ -392,7 +416,7 @@ function renderMoments() {
         h("span", { class: "moment-delta tabular", text: `+${Math.round(Math.abs(delta) * 100)}` }),
         h("span", { class: "moment-body" },
           h("span", { class: "moment-title", text: `${t.innings === 1 ? "1st" : "2nd"} inns ${t.label} · ${describeBall(t)}` }),
-          h("span", { class: "moment-meta mono muted", text: `${abbr(gainer)} ${pct(from)} → ${pct(to)} · ${t.bowler} to ${t.batter}` }),
+          h("span", { class: "moment-meta", text: `${abbr(gainer)} ${pct(from)} → ${pct(to)} · ${t.bowler} to ${t.batter}` }),
         ),
       );
       button.addEventListener("click", () => {
@@ -540,7 +564,7 @@ function modelPanel(r, title, index) {
   );
 
   const final = r.test.calibrated;
-  const kpi = (label, value) => h("div", { class: "kpi" }, h("dt", { class: "mono muted", text: label }), h("dd", { class: "tabular", text: value }));
+  const kpi = (label, value) => h("div", { class: "kpi" }, h("dt", { text: label }), h("dd", { class: "tabular", text: value }));
   const cells = (s) => [s.log_loss.toFixed(3), s.brier.toFixed(3), s.auc.toFixed(3), `${(s.ece * 100).toFixed(1)}%`];
   const table = h("table", {},
     h("thead", {}, h("tr", {}, ...["Model", "Log loss", "Brier", "AUC", "Calib. error"].map((text) => h("th", { scope: "col", text })))),
@@ -552,9 +576,9 @@ function modelPanel(r, title, index) {
     )),
   );
 
-  const node = h("article", { class: "model-panel" },
+  const node = h("article", { class: "card model-panel" },
     h("div", { class: "model-panel-head" },
-      h("p", { class: "mono muted", text: `(0${index + 1}) ${r.matches.test} test matches` }),
+      h("p", { class: "eyebrow", text: `${r.matches.test} test matches` }),
       h("h3", { text: title }),
     ),
     h("dl", { class: "kpis" },
@@ -564,7 +588,7 @@ function modelPanel(r, title, index) {
     ),
     h("figure", { class: "reliability" }, legend, svg, readout),
     h("div", { class: "table-wrap" }, table),
-    h("p", { class: "mono muted", text: `Blend: ${Math.round(r.blend_weight * 100)}% gradient-boosted · ${r.gbm_trees} trees` }),
+    h("p", { class: "model-foot", text: `Blend: ${Math.round(r.blend_weight * 100)}% gradient-boosted · ${r.gbm_trees} trees` }),
   );
 
   const inBand = (key, band) => (bins[key] ?? []).find((b) => Math.round(b.lo * 10) === band);
@@ -716,6 +740,10 @@ function bind() {
 }
 
 async function boot() {
+  teamLogos().then((logos) => {
+    state.logos = logos;
+    if (state.match) renderMatchHead();
+  });
   api("/api/model")
     .then(renderModelCard)
     .catch(() => {
